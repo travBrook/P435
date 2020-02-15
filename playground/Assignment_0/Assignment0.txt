@@ -1,0 +1,22 @@
+I made two tests in driver.py. Run:
+
+python driver.py 
+
+with all the files in the same directory and it should output
+something close to what driverOutput.txt has. 
+
+
+'''
+    Test one covers all the tests mentioned in the assignment.
+    (1)In addition to the two initial STORE calls to the server in 
+    alice.py, alice supplies two more STORE calls through arguments, and even 
+    calls a GET. The test then sleeps for 5 seconds to ensure 
+    that all of Alice's values get stored before bob starts.
+    It will still work correctly if there is no sleep, but there is 
+    a chance that Bob will query a key that is not on the server...
+    (2)Bob runs three GET calls and one STORE. (3)In the bob.py file,
+    one of the GET calls in messages tries to retrieve a key that is
+    not stored in the server. 
+'''
+
+Test two covers more erroneous inputs. 

@@ -1,0 +1,100 @@
+TEST ONE START
+
+[Alice] starting connection to ('127.0.0.1', 65431)
+[Server] listening on ('127.0.0.1', 65431)
+[Alice] these are the messages still to be sent :  [b'STORE foo=username', b'STORE blah=username2', b'STORE joe=shmoe', b'STORE diggity=hehe', b'GET joe']
+[Server] accepted connection from ('127.0.0.1', 49873)
+[Alice] sending b'STORE foo=username' to server
+[Server] Current key values on server:  {'FOO': 'username'}
+[Alice] received b'Success at storing : key - foo, value - username' from the server
+[Alice] these are the messages still to be sent :  [b'STORE blah=username2', b'STORE joe=shmoe', b'STORE diggity=hehe', b'GET joe']
+[Alice] sending b'STORE blah=username2' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2'}
+[Alice] received b'Success at storing : key - blah, value - username2' from the server
+[Alice] these are the messages still to be sent :  [b'STORE joe=shmoe', b'STORE diggity=hehe', b'GET joe']
+[Alice] sending b'STORE joe=shmoe' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe'}
+[Alice] received b'Success at storing : key - joe, value - shmoe' from the server
+[Alice] these are the messages still to be sent :  [b'STORE diggity=hehe', b'GET joe']
+[Alice] sending b'STORE diggity=hehe' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe'}
+[Alice] received b'Success at storing : key - diggity, value - hehe' from the server
+[Alice] these are the messages still to be sent :  [b'GET joe']
+[Alice] sending b'GET joe' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe'}
+[Bob] starting connection to ('127.0.0.1', 65431)
+[Bob] these are the messages still to be sent :  [b'GET foo', b'GET hehe', b'GET joe', b'Store blahby=hello']
+[Bob] sending b'GET foo' to server
+[Server] accepted connection from ('127.0.0.1', 49875)
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe'}
+[Alice] received b'The value for key [JOE] is : shmoe' from the server
+[Bob] received b'The value for key [FOO] is : username' from the server
+[Bob] these are the messages still to be sent :  [b'GET hehe', b'GET joe', b'Store blahby=hello']
+[Bob] sending b'GET hehe' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe'}
+[Bob] received b'ERROR -- KEY NOT FOUND' from the server
+[Bob] these are the messages still to be sent :  [b'GET joe', b'Store blahby=hello']
+[Bob] sending b'GET joe' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe'}
+[Bob] received b'The value for key [JOE] is : shmoe' from the server
+[Bob] these are the messages still to be sent :  [b'Store blahby=hello']
+[Bob] sending b'Store blahby=hello' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello'}
+[Bob] received b'Success at storing : key - blahby, value - hello' from the server
+TEST ONE END
+
+STARTING TEST TWO IN 3 seconds
+
+[Alice] starting connection to ('127.0.0.1', 65431)
+[Alice] these are the messages still to be sent :  [b'STORE foo=username', b'STORE blah=username2', b'Erroneous_Data', b'No way this works?', b'STORE bb=']
+[Server] accepted connection from ('127.0.0.1', 49877)
+[Alice] sending b'STORE foo=username' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello'}
+[Alice] received b'Success at storing : key - foo, value - username' from the server
+[Alice] these are the messages still to be sent :  [b'STORE blah=username2', b'Erroneous_Data', b'No way this works?', b'STORE bb=']
+[Alice] sending b'STORE blah=username2' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello'}
+[Alice] received b'Success at storing : key - blah, value - username2' from the server
+[Alice] these are the messages still to be sent :  [b'Erroneous_Data', b'No way this works?', b'STORE bb=']
+[Alice] sending b'Erroneous_Data' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello'}
+[Alice] received b'Wrong input format, please use: STORE key=value   or    GET key' from the server
+[Alice] these are the messages still to be sent :  [b'No way this works?', b'STORE bb=']
+[Alice] sending b'No way this works?' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello'}
+[Alice] received b'Wrong input format, please use: STORE key=value   or    GET key' from the server
+[Alice] these are the messages still to be sent :  [b'STORE bb=']
+[Alice] sending b'STORE bb=' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+
+C:\Users\T Baby\Documents\GitHub\P435>[Bob] starting connection to ('127.0.0.1', 65431)
+[Bob] these are the messages still to be sent :  [b'GET foo', b'GET hehe', b'My', b'Name', b'IS BOB', b'GET bb', b'STORE michelle dd']
+[Bob] sending b'GET foo' to server
+[Server] accepted connection from ('127.0.0.1', 49878)
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Alice] received b'Success at storing : key - bb, value - ' from the server
+[Bob] received b'The value for key [FOO] is : username' from the server
+[Bob] these are the messages still to be sent :  [b'GET hehe', b'My', b'Name', b'IS BOB', b'GET bb', b'STORE michelle dd']
+[Bob] sending b'GET hehe' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Bob] received b'ERROR -- KEY NOT FOUND' from the server
+[Bob] these are the messages still to be sent :  [b'My', b'Name', b'IS BOB', b'GET bb', b'STORE michelle dd']
+[Bob] sending b'My' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Bob] received b'Wrong input format, please use: STORE key=value   or    GET key' from the server
+[Bob] these are the messages still to be sent :  [b'Name', b'IS BOB', b'GET bb', b'STORE michelle dd']
+[Bob] sending b'Name' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Bob] received b'Wrong input format, please use: STORE key=value   or    GET key' from the server
+[Bob] these are the messages still to be sent :  [b'IS BOB', b'GET bb', b'STORE michelle dd']
+[Bob] sending b'IS BOB' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Bob] received b'Wrong input format, please use: STORE key=value   or    GET key' from the server
+[Bob] these are the messages still to be sent :  [b'GET bb', b'STORE michelle dd']
+[Bob] sending b'GET bb' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Bob] received b'The value for key [BB] is : ' from the server
+[Bob] these are the messages still to be sent :  [b'STORE michelle dd']
+[Bob] sending b'STORE michelle dd' to server
+[Server] Current key values on server:  {'FOO': 'username', 'BLAH': 'username2', 'JOE': 'shmoe', 'DIGGITY': 'hehe', 'BLAHBY': 'hello', 'BB': ''}
+[Bob] received b'Invalid key-value pair... try form: STORE __=__' from the server
