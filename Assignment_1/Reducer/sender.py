@@ -5,7 +5,6 @@ import types
 import time
 
 sel = selectors.DefaultSelector()
-messages = [b"GET foo", b"GET hehe"]
 
 '''
     To run this program:
@@ -17,13 +16,6 @@ messages = [b"GET foo", b"GET hehe"]
 '''
 
 def start_connections(host, port):
-
-    #Add the arguments to the messages that will be sent
-    for i in range(0, len(sys.argv)):
-        if i == 0:
-            continue
-        else :
-            messages.append(bytes(sys.argv[i], encoding='utf8'))
 
     server_addr = (host, port)
     print("[Reducer] starting connection to", server_addr)
@@ -65,12 +57,16 @@ def service_connection(key, mask):
 
 
 
-if len(sys.argv) != 3:
-    print("usage:", sys.argv[0], "<host> <port>")
+if len(sys.argv) != 4:
+    print("usage:", sys.argv[0], "<host> <port> <id>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = int(sys.argv[2])
+redID = int(sys.argv[3])
+
+thisReducer = bytes("Reducer" + str(redID), encoding='utf8')
+messages = [thisReducer]
 
 start_connections(host, int(port))
 

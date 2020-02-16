@@ -17,30 +17,32 @@ notReady = False
 def init_Clusters():
 
     '''
-    Start master server
-    Start mappers, reducers, spawn Master OKServers
-
+        DO A CHECK THAT EVERYONE IS RESPONDING 
     '''
 
+    '''
+        Spawn the master receiver to check 
+    '''
     ok = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
-    startingHost, startingPort, numberOfMappers, numberOfReducers])
+    startingHost, startingPort, str(numberOfMappers), str(numberOfReducers)])
 
     #subprocess.Popen(['echo' , '%cd%'], cwd='../', shell=True)
     
-    
-    
+    '''
+        Spawn the mappers and reducers
+    '''    
     for i in range(0, numberOfMappers): 
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/main.py', startingHost, startingPort])
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/main.py', startingHost, startingPort, str(i)])
 
     for i in range(0, numberOfReducers):
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/main.py', startingHost, startingPort])
-    
-    #while notReady : 
-    #    pass
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/main.py', startingHost, startingPort, str(i)])
 
+    '''
+        Wait 10 seconds for response from everyone
+    '''
     status = ok.wait(timeout=10)
     if status == 0:
         print("READY!")
@@ -48,8 +50,6 @@ def init_Clusters():
     else :   
         print("OUCH!")
 
-
-    
 
 
 if len(sys.argv) != 3:
@@ -70,8 +70,6 @@ for proc in process_iter():
         if conns.laddr.port == 65431:
             proc.send_signal(SIGTERM)
 '''
-
-
 '''
 for proc in process_iter():
     for conns in proc.connections(kind='inet'):

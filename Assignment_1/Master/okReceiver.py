@@ -35,16 +35,15 @@ def service_connection(key, mask):
                 sent = sock.send(sendBack)  # Should be ready to write
                 print("[OKServer] Current absentees on roster : ", roster)
                 data.outb = data.outb[sent:]
-                killMe = True
 
 
 def createRoster() : 
 
     for i in range(0, numberOfMappers):
-        roster.append("Mapper" + i)
+        roster.append("Mapper" + str(i))
 
     for i in range(0, numberOfReducers): 
-        roster.append("Reducer" + i)
+        roster.append("Reducer" + str(i))
 
 
 '''
@@ -53,7 +52,10 @@ def createRoster() :
 def takeAttendance(s):
     
     theMapOrRed = s[2:len(s)-1]
-    roster.pop(theMapOrRed)
+    if theMapOrRed is None :
+        return bytes("OW!", encoding='utf8')
+    roster.remove(theMapOrRed)
+    return bytes("Thank you, " + theMapOrRed, encoding='utf8')
 
 
     '''
