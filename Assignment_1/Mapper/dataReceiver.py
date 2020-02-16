@@ -6,19 +6,10 @@ import sys
 host = "127.0.0.1"
 port = 65431
 
-numberOfMappers = sys.argv[1]
-numberOfReducers = sys.argv[2]
-clusterID = 0
-
 sel = selectors.DefaultSelector()
 
 keyValues = {}
 
-def init_Clusters():
-
-    ###Start mappers, start 
-
-    return clusterID + 1
 
 
 
