@@ -3,6 +3,7 @@ import sys
 import selectors
 from psutil import process_iter
 from signal import SIGTERM
+import time
 
 
 clusterID = 0
@@ -21,13 +22,16 @@ def init_Clusters():
     '''
 
     '''
-        Spawn the master receiver to check 
+        Spawn the master receiver  
     '''
     ok = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
     startingHost, startingPort, str(numberOfMappers), str(numberOfReducers)])
 
+    time.sleep(3)
+
     #subprocess.Popen(['echo' , '%cd%'], cwd='../', shell=True)
+
     
     '''
         Spawn the mappers and reducers
@@ -44,6 +48,7 @@ def init_Clusters():
         Wait 10 seconds for response from everyone
     '''
     status = ok.wait(timeout=10)
+    time.sleep(3)
     if status == 0:
         print("READY!")
         return clusterID + 1
@@ -62,19 +67,31 @@ numberOfReducers = int(sys.argv[2])
 
 
 '''
+    FOR LOCAL USE
     Before intitializing, clear ports we want to use...
 '''
-'''
-for proc in process_iter():
-    for conns in proc.connections(kind='inet'):
-        if conns.laddr.port == 65431:
-            proc.send_signal(SIGTERM)
-'''
-'''
-for proc in process_iter():
-    for conns in proc.connections(kind='inet'):
-        if conns.laddr.port == 65433:
-            proc.send_signal(SIGTERM)
-'''
+for i in range(0,numberOfMappers) : 
+    
+    for proc in process_iter():
+        for conns in proc.connections(kind='inet'):
+            if conns.laddr.port == (65430-i):
+                proc.send_signal(SIGTERM)
 
-init_Clusters()
+for i in range(0,numberOfMappers) : 
+    
+    for proc in process_iter():
+        for conns in proc.connections(kind='inet'):
+            if conns.laddr.port == (65432+i):
+                proc.send_signal(SIGTERM)
+
+
+
+'''
+    Ready the troops
+'''
+aCluster = init_Clusters()
+
+
+'''
+    Prompt for user input to get input file/output location, and map/red functions
+'''

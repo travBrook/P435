@@ -3,19 +3,14 @@ import socket
 import types
 import sys
 
-host = "127.0.0.1"
-port = 65431
-
 sel = selectors.DefaultSelector()
 
 keyValues = {}
 
 
-
-
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
-    print('[Server] accepted connection from', addr)
+    print('[MDRecvr] accepted connection from', addr)
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
@@ -31,7 +26,7 @@ def service_connection(key, mask):
             sendBack = addToKeyValue(repr(recv_data))
             data.outb += recv_data
         else:
-            print('[Server] closing connection to', data.addr)
+            print('[MDRecvr] closing connection to', data.addr)
             sel.unregister(sock)
             sock.close()
     if mask & selectors.EVENT_WRITE:
@@ -39,7 +34,7 @@ def service_connection(key, mask):
             #Here is where we send the status or value back to the client
             if (b'Welcome' != sendBack):
                 sent = sock.send(sendBack)  # Should be ready to write
-                print("[Server] Current key values on server: ", keyValues)
+                print("[MDRecvr] Current key values on server: ", keyValues)
                 data.outb = data.outb[sent:]
 
 
@@ -76,11 +71,20 @@ def addToKeyValue(s):
 
     return bytes("Wrong input format, please use: STORE key=value   or    GET key", encoding='utf8') 
 
+
+if len(sys.argv) != 4:
+    print("usage:", sys.argv[0], "<host> <port> <id>")
+    sys.exit(1)
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+
+
 #Socket set up
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 lsock.bind((host, port))
 lsock.listen()
-print("[Server] listening on", (host, port))
+print("[MDRecvr] listening on", (host, port))
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
@@ -93,7 +97,7 @@ try:
             else:
                 service_connection(key, mask)
 except KeyboardInterrupt:
-    print("[Server] caught keyboard interrupt, exiting")
+    print("[MDRecvr] caught keyboard interrupt, exiting")
 finally:
-    print("[Server] FINALLY")
+    print("[MDRecvr] FINALLY")
     sel.close()
