@@ -4,19 +4,12 @@ import selectors
 from psutil import process_iter
 from signal import SIGTERM
 import time
-#import rpyc
+import rpyc
 
 
 def main() :
 
     #print("Howdy from reducer!" + redID)
-    '''
-    FOR STARTING REMOTELY
-    rpc = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/rpyc_classic.py',
-    ("-p "+ str(remoteReceiverPort))])
-    '''
-    
 
     rcvr = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/dataReceiver.py', receiverHost, str(receiverPort), redID])
@@ -25,7 +18,7 @@ def main() :
 
     if rcvr.poll() is None : 
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/sender.py', startingHost, startingPort, redID, receiverHost, str(receiverPort)])
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/sender.py', startingHost, startingPort, redID])
     else : sys.exit(1)
 
 
@@ -41,12 +34,7 @@ receiverHost = startingHost[0:len(startingHost)-1]
 receiverHost += str(int(redID)+2)
 receiverPort = int(startingPort) + int(redID) + 1
 
-#For starting remotely
-'''
-remoteReceiverHost = startingHost[0:len(startingHost)-1]
-remoteReceiverHost += str(int(mapID)+1)
-remoteReceiverPort = int(startingPort) - int(mapID) - 50
-'''
-
 main()
 
+conn = rpyc.classic.connect("localhost")
+conn.execute("print('Hello from Tutorialspoint')")

@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package tutorial;
+
+message INFO{
+  optional string name = 1;
+  optional string host = 2;
+  optional int32 port = 3;
+}
+
+message DATA {
+  optional string data = 1;
+}
+

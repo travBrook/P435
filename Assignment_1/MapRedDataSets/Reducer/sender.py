@@ -18,13 +18,13 @@ sel = selectors.DefaultSelector()
 def start_connections(host, port):
 
     server_addr = (host, port)
-    #print("[Mapper] starting connection to", server_addr)
+    print("[Reducer] starting connection to", server_addr)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setblocking(False)
     sock.connect_ex(server_addr)
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     data = types.SimpleNamespace(
-        connid="Mapper",
+        connid="Reducer",
         msg_total=sum(len(m) for m in messages),
         recv_total=0,
         messages=list(messages),
@@ -39,34 +39,34 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
-            #print("[Mapper] received", repr(recv_data), "from the server")
+            print("[Reducer] received", repr(recv_data), "from the server")
             data.recv_total += len(recv_data)
         if not recv_data or data.recv_total == data.msg_total:
-            #print("[Mapper] closing connection to server")
+            print("[Reducer] closing connection to server")
             sel.unregister(sock)
             sock.close()
     if mask & selectors.EVENT_WRITE:
         if not data.outb and data.messages:
-            #print("[Mapper] these are the messages still to be sent : ", data.messages)
+            print("[Reducer] these are the messages still to be sent : ", data.messages)
             data.outb = data.messages.pop(0)
         if data.outb:
-            #print("[Mapper] sending", repr(data.outb), "to server")
+            print("[Reducer] sending", repr(data.outb), "to server")
             sent = sock.send(data.outb)  # Should be ready to write
             time.sleep(1)   # This sleep allows the server to receive each message individually
             data.outb = data.outb[sent:]
 
 
 
-if len(sys.argv) != 6:
-    print("usage:", sys.argv[0], "<host> <port> <id> <rec host> <rec port>")
+if len(sys.argv) != 4:
+    print("usage:", sys.argv[0], "<host> <port> <id>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = int(sys.argv[2])
-mapID = int(sys.argv[3])
+redID = int(sys.argv[3])
 
-thisMapper = bytes("Mapper" + str(mapID)+ " " + sys.argv[4] + " " + sys.argv[5], encoding='utf8')
-messages = [thisMapper]
+thisReducer = bytes("Reducer" + str(redID), encoding='utf8')
+messages = [thisReducer]
 
 start_connections(host, int(port))
 
@@ -80,6 +80,6 @@ try:
         if not sel.get_map():
             break
 except KeyboardInterrupt:
-    print("[Mapper] caught keyboard interrupt, exiting")
+    print("[Reducer] caught keyboard interrupt, exiting")
 finally:
     sel.close()

@@ -3,14 +3,14 @@ import socket
 import types
 import sys
 
-
 sel = selectors.DefaultSelector()
 
-roster = [] #The roster holds the mappers/reducers that haven't checked in yet
+keyValues = {}
+
 
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
-    #print('[OKServer] accepted connection from', addr)
+    print('[RDRecvr] accepted connection from', addr)
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
@@ -23,46 +23,29 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
-            sendBack = takeAttendance(repr(recv_data))
+            sendBack = addToKeyValue(repr(recv_data))
             data.outb += recv_data
         else:
-            #print('[OKServer] closing connection to', data.addr)
+            print('[RDRecvr] closing connection to', data.addr)
             sel.unregister(sock)
             sock.close()
     if mask & selectors.EVENT_WRITE:
         if data.outb:
+            #Here is where we send the status or value back to the client
             if (b'Welcome' != sendBack):
                 sent = sock.send(sendBack)  # Should be ready to write
-                #print("[OKServer] Current absentees on roster : ", roster)
+                print("[RDRecvr] Current key values on server: ", keyValues)
                 data.outb = data.outb[sent:]
 
 
-def createRoster() : 
-
-    for i in range(0, numberOfMappers):
-        roster.append("Mapper" + str(i))
-
-    for i in range(0, numberOfReducers): 
-        roster.append("Reducer" + str(i))
-
-
 '''
-    Receives notice from Mapper or Reducer and removes from roster
+    Takes user request (GET or STORE) and returns appropriate response
 '''
-def takeAttendance(s):
+def addToKeyValue(s):
     
-
-    theMapOrRed = s[2:len(s)-1]
-    print(theMapOrRed + " ") ### prints to stdout where it is piped to parent
-
-    name = theMapOrRed.split()[0]
-    if name is None :
-        return bytes("OW!", encoding='utf8')
-    roster.remove(name)
-    return bytes("Thank you, " + theMapOrRed, encoding='utf8')
-
-
-    '''
+    #First see if user is storing or getting key-value
+    command = s.split(" ")
+    theCommand = command[0][2:len(command[0])]
 
     #If it is a get, return the value given the key or error message
     if theCommand.upper() == "GET":
@@ -86,39 +69,27 @@ def takeAttendance(s):
         except IndexError:
             return bytes("Invalid key-value pair... try form: STORE __=__", encoding='utf8')
 
-    killMe = True
     return bytes("Wrong input format, please use: STORE key=value   or    GET key", encoding='utf8') 
-    '''
 
-'''
-    Getting the parameters and setting up the roster
-'''
-if len(sys.argv) != 5:
-    print("usage:", sys.argv[0], "<host> <port> <numberOfMappers> <numberOfReducers>")
+
+if len(sys.argv) != 4:
+    print("usage:", sys.argv[0], "<host> <port> <id>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = int(sys.argv[2])
-numberOfMappers = int(sys.argv[3])
-numberOfReducers = int(sys.argv[4])
-createRoster()
 
-'''
-    Socket set up
-'''
+
+#Socket set up
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 lsock.bind((host, port))
 lsock.listen()
-#print("[OKServer] listening on", (host, port))
+print("[RDRecvr] listening on", (host, port))
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
-
-'''
-    We only terminate when everyone on the roster has been checked off
-'''
 try:
-    while len(roster) != 0:
+    while True:
         events = sel.select(timeout=None)
         for key, mask in events:
             if key.data is None:
@@ -126,9 +97,7 @@ try:
             else:
                 service_connection(key, mask)
 except KeyboardInterrupt:
-    print("[OKServer] caught keyboard interrupt, exiting")
+    print("[RDRecvr] caught keyboard interrupt, exiting")
 finally:
-    #print("[OKServer] FINALLY")
-    #print(repr(sys.stdin))
-    #print(sys.stdin.readline())
+    print("[RDRecvr] FINALLY")
     sel.close()
