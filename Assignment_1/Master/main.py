@@ -25,7 +25,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
     '''
     try:
         pass
-        f = open(inputData, "r")
+        f = open(inputData, "r", encoding="utf8")
         lines = f.readlines()
         f.close()
     except IOError:
@@ -69,10 +69,13 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             reducerHost, reducerPort = rosterDict["Reducer" + str(i-numberOfReducers)]
         else: 
             reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
-        subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
-        mapperHost, mapperPort, chunks[i], reducerHost, reducerPort, mapFn])
 
+        
+        relayers = subprocess.Popen(['python.exe', 
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
+        mapperHost, mapperPort, "chunks[i]", reducerHost, reducerPort, mapFn], stdin=subprocess.PIPE)
+
+        outs = relayers.communicate(input=bytes(chunks[i], encoding='utf8'),timeout=15)[0]
 
     '''
         ef

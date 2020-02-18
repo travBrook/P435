@@ -55,7 +55,7 @@ def service_connection(key, mask):
 
 
 if len(sys.argv) != 7:
-    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <id> <reducerHost> <reducerPort> <mapFn>")
+    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <data> <reducerHost> <reducerPort> <mapFn>")
     sys.exit(1)
 
 host = sys.argv[1]
@@ -68,6 +68,7 @@ thisMessage = comms_pb2.AMessage()
 #thisMessage.theSender.host = port
 #thisMessage.theSender.port = host
 
+thisMessage.data = sys.stdin.readline()
 thisMessage.theFriend.name = "RDRcvr"
 thisMessage.theFriend.host = sys.argv[4]
 thisMessage.theFriend.port = sys.argv[5]

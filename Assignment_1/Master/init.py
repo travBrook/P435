@@ -66,7 +66,7 @@ def init_Clusters():
         Once the server is done collecting data from the Mappers/Reducers,
         we are allowed to continue
     '''
-    outs = ok.communicate(input=bytes("Hello buddy", encoding='utf8'),timeout=10)[0]
+    outs = ok.communicate(input=bytes("Hello buddy", encoding='utf8'),timeout=15)[0]
     #Stripping and splitting below ... 
     output = repr(outs)[2:len(repr(outs))-1] 
     output = output.replace('\\r', '')
@@ -82,7 +82,7 @@ def init_Clusters():
 
     print("The roster is : " + str(rosterDict))
 
-    status = ok.wait(timeout=10)
+    status = ok.wait(timeout=15)
 
     #If everything went according to plan, we signal we're ready.
     if status == 0:
@@ -160,6 +160,7 @@ for i in range(0,numberOfReducers) :
         for conns in proc.connections(kind='inet'):
             if conns.laddr.port == (65432+i):
                 proc.send_signal(SIGTERM)
+
 
 
 '''
