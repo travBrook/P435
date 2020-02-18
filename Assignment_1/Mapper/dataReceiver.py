@@ -42,6 +42,7 @@ def mapData(s):
     theMapOrRedMessage = comms_pb2.AMessage()
     theMapOrRedMessage.ParseFromString(s)
     print(theMapOrRedMessage)
+    return bytes("Thank you, i'll handle this, master", encoding='utf8')
 
 '''
 def createRoster() : 
@@ -92,7 +93,7 @@ port = int(sys.argv[2])
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 lsock.bind((host, port))
 lsock.listen()
-#print("[OKServer] listening on", (host, port))
+print("[MDRecvr] listening on", (host, port))
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
@@ -101,7 +102,7 @@ sel.register(lsock, selectors.EVENT_READ, data=None)
     We only terminate when everyone on the roster has been checked off
 '''
 try:
-    while len(roster) != 0:
+    while True:
         events = sel.select(timeout=None)
         for key, mask in events:
             if key.data is None:
@@ -109,7 +110,7 @@ try:
             else:
                 service_connection(key, mask)
 except KeyboardInterrupt:
-    print("[OKServer] caught keyboard interrupt, exiting")
+    print("[MDRecvr] caught keyboard interrupt, exiting")
 finally:
     #print("[OKServer] FINALLY")
     #print(repr(sys.stdin))

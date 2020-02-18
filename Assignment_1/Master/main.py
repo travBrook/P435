@@ -13,6 +13,8 @@ rosterDict = {}
 numberOfMappers = 0
 numberOfReducers = 0
 
+###FOR ME : For path issues, consider local variable (could even be read off of file), then concat
+
 def runMapRed(inputData, mapFn, redFn, outputLoc) : 
 
     '''
@@ -68,7 +70,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         else: 
             reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataTrader.py',
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
         mapperHost, mapperPort, chunks[i], reducerHost, reducerPort, mapFn])
 
 

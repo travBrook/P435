@@ -146,6 +146,7 @@ numberOfReducers = int(sys.argv[2])
     FOR LOCAL USE
     Before intitializing, clear ports we want to use...
 '''
+
 for i in range(0,numberOfMappers) : 
     
     for proc in process_iter():
