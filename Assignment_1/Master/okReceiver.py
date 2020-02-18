@@ -2,6 +2,7 @@ import selectors
 import socket
 import types
 import sys
+import comms_pb2
 
 
 sel = selectors.DefaultSelector()
@@ -23,7 +24,7 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
-            sendBack = takeAttendance(repr(recv_data))
+            sendBack = takeAttendance(recv_data)
             data.outb += recv_data
         else:
             #print('[OKServer] closing connection to', data.addr)
@@ -51,15 +52,19 @@ def createRoster() :
 '''
 def takeAttendance(s):
     
+    theMapOrRedMessage = comms_pb2.AMessage()
+    theMapOrRedMessage.ParseFromString(s)
 
-    theMapOrRed = s[2:len(s)-1]
-    print(theMapOrRed + " ") ### prints to stdout where it is piped to parent
+    senderName = theMapOrRedMessage.theSender.name
+    rcvrHost = theMapOrRedMessage.theFriend.host
+    rcvrPort = theMapOrRedMessage.theFriend.port
 
-    name = theMapOrRed.split()[0]
-    if name is None :
+    print(senderName + " " + rcvrHost + " " + rcvrPort + " ") ### prints to stdout where it is piped to parent
+
+    if senderName is None :
         return bytes("OW!", encoding='utf8')
-    roster.remove(name)
-    return bytes("Thank you, " + theMapOrRed, encoding='utf8')
+    roster.remove(senderName)
+    return bytes("Thank you, " + senderName, encoding='utf8')
 
 
     '''

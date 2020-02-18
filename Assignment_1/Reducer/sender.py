@@ -3,6 +3,7 @@ import socket
 import selectors
 import types
 import time
+import comms_pb2
 
 sel = selectors.DefaultSelector()
 
@@ -62,11 +63,19 @@ if len(sys.argv) != 6:
     sys.exit(1)
 
 host = sys.argv[1]
-port = int(sys.argv[2])
-redID = int(sys.argv[3])
+port = sys.argv[2]
+redID = sys.argv[3]
 
-thisReducer = bytes("Reducer" + str(redID) + " " + sys.argv[4] + " " + sys.argv[5], encoding='utf8')
-messages = [thisReducer]
+thisMessage = comms_pb2.AMessage()
+thisMessage.theSender.name = "Reducer" + redID
+thisMessage.theSender.host = port
+thisMessage.theSender.port = host
+thisMessage.theFriend.name = "RDRcvr" + redID
+thisMessage.theFriend.host = sys.argv[4]
+thisMessage.theFriend.port = sys.argv[5]
+
+finalMessage = thisMessage.SerializeToString()
+messages = [finalMessage]
 
 start_connections(host, int(port))
 

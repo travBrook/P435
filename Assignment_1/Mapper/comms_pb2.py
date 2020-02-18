@@ -15,70 +15,39 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='comms.proto',
-  package='tutorial',
+  package='',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=b'\n\x0b\x63omms.proto\x12\x08tutorial\"0\n\x04INFO\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\"\x14\n\x04\x44\x41TA\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\t'
+  serialized_pb=b'\n\x0b\x63omms.proto\"\xf6\x01\n\x08\x41Message\x12\x18\n\x10\x66unctionFileName\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\t\x12\'\n\ttheSender\x18\x03 \x01(\x0b\x32\x14.AMessage.InfoOnSelf\x12(\n\ttheFriend\x18\x04 \x01(\x0b\x32\x15.AMessage.InfoOnOther\x1a\x36\n\nInfoOnSelf\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\t\x1a\x37\n\x0bInfoOnOther\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\t'
 )
 
 
 
 
-_INFO = _descriptor.Descriptor(
-  name='INFO',
-  full_name='tutorial.INFO',
+_AMESSAGE_INFOONSELF = _descriptor.Descriptor(
+  name='InfoOnSelf',
+  full_name='AMessage.InfoOnSelf',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='tutorial.INFO.name', index=0,
+      name='name', full_name='AMessage.InfoOnSelf.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='host', full_name='tutorial.INFO.host', index=1,
+      name='host', full_name='AMessage.InfoOnSelf.host', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='port', full_name='tutorial.INFO.port', index=2,
-      number=3, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=25,
-  serialized_end=73,
-)
-
-
-_DATA = _descriptor.Descriptor(
-  name='DATA',
-  full_name='tutorial.DATA',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='data', full_name='tutorial.DATA.data', index=0,
-      number=1, type=9, cpp_type=9, label=1,
+      name='port', full_name='AMessage.InfoOnSelf.port', index=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -95,27 +64,134 @@ _DATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=75,
-  serialized_end=95,
+  serialized_start=151,
+  serialized_end=205,
 )
 
-DESCRIPTOR.message_types_by_name['INFO'] = _INFO
-DESCRIPTOR.message_types_by_name['DATA'] = _DATA
+_AMESSAGE_INFOONOTHER = _descriptor.Descriptor(
+  name='InfoOnOther',
+  full_name='AMessage.InfoOnOther',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='AMessage.InfoOnOther.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='host', full_name='AMessage.InfoOnOther.host', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='port', full_name='AMessage.InfoOnOther.port', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=207,
+  serialized_end=262,
+)
+
+_AMESSAGE = _descriptor.Descriptor(
+  name='AMessage',
+  full_name='AMessage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='functionFileName', full_name='AMessage.functionFileName', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data', full_name='AMessage.data', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='theSender', full_name='AMessage.theSender', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='theFriend', full_name='AMessage.theFriend', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_AMESSAGE_INFOONSELF, _AMESSAGE_INFOONOTHER, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=16,
+  serialized_end=262,
+)
+
+_AMESSAGE_INFOONSELF.containing_type = _AMESSAGE
+_AMESSAGE_INFOONOTHER.containing_type = _AMESSAGE
+_AMESSAGE.fields_by_name['theSender'].message_type = _AMESSAGE_INFOONSELF
+_AMESSAGE.fields_by_name['theFriend'].message_type = _AMESSAGE_INFOONOTHER
+DESCRIPTOR.message_types_by_name['AMessage'] = _AMESSAGE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-INFO = _reflection.GeneratedProtocolMessageType('INFO', (_message.Message,), {
-  'DESCRIPTOR' : _INFO,
-  '__module__' : 'comms_pb2'
-  # @@protoc_insertion_point(class_scope:tutorial.INFO)
-  })
-_sym_db.RegisterMessage(INFO)
+AMessage = _reflection.GeneratedProtocolMessageType('AMessage', (_message.Message,), {
 
-DATA = _reflection.GeneratedProtocolMessageType('DATA', (_message.Message,), {
-  'DESCRIPTOR' : _DATA,
+  'InfoOnSelf' : _reflection.GeneratedProtocolMessageType('InfoOnSelf', (_message.Message,), {
+    'DESCRIPTOR' : _AMESSAGE_INFOONSELF,
+    '__module__' : 'comms_pb2'
+    # @@protoc_insertion_point(class_scope:AMessage.InfoOnSelf)
+    })
+  ,
+
+  'InfoOnOther' : _reflection.GeneratedProtocolMessageType('InfoOnOther', (_message.Message,), {
+    'DESCRIPTOR' : _AMESSAGE_INFOONOTHER,
+    '__module__' : 'comms_pb2'
+    # @@protoc_insertion_point(class_scope:AMessage.InfoOnOther)
+    })
+  ,
+  'DESCRIPTOR' : _AMESSAGE,
   '__module__' : 'comms_pb2'
-  # @@protoc_insertion_point(class_scope:tutorial.DATA)
+  # @@protoc_insertion_point(class_scope:AMessage)
   })
-_sym_db.RegisterMessage(DATA)
+_sym_db.RegisterMessage(AMessage)
+_sym_db.RegisterMessage(AMessage.InfoOnSelf)
+_sym_db.RegisterMessage(AMessage.InfoOnOther)
 
 
 # @@protoc_insertion_point(module_scope)

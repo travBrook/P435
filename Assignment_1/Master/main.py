@@ -58,10 +58,12 @@ def init_Clusters():
     output = repr(outs)[2:len(repr(outs))-1]
     output = output.replace('\\r', '')
     output = output.replace('\\n', '')
+    print(output)
     output = output[0:len(output)-1]
 
 
     newMapReds = output.split(" ")
+    print(newMapReds)
 
     while len(newMapReds) != 0:
         name = newMapReds.pop(0)

@@ -1,14 +1,25 @@
 syntax = "proto2";
 
-package tutorial;
 
-message INFO{
-  optional string name = 1;
-  optional string host = 2;
-  optional int32 port = 3;
+message AMessage{
+
+  optional string functionFileName = 1;
+  optional string data = 2;  
+
+  message InfoOnSelf{
+    optional string name = 1;
+    optional string host = 2;
+    optional string port = 3;
+  }
+
+  optional InfoOnSelf theSender = 3;
+  
+  message InfoOnOther{
+    optional string name = 1;
+    optional string host = 2;
+    optional string port = 3;
+  }
+
+  optional InfoOnOther theFriend = 4;
+
 }
-
-message DATA {
-  optional string data = 1;
-}
-
