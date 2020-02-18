@@ -65,35 +65,7 @@ def takeAttendance(s):
         return bytes("OW!", encoding='utf8')
     roster.remove(senderName)
     return bytes("Thank you, " + senderName, encoding='utf8')
-
-
-    '''
-
-    #If it is a get, return the value given the key or error message
-    if theCommand.upper() == "GET":
-        #Try to get the key value pair. If not found, return error
-        try:
-            theKey = command[1][0:(len(command[1])-1)].upper()
-            theValue = keyValues[theKey]
-            return bytes("The value for key [" + str(theKey) + "] is : " + str(theValue), encoding='utf8')
-        except KeyError:
-            return bytes("ERROR -- KEY NOT FOUND", encoding='utf8')            
-
-    #If it is a store, store it in the dictionary
-    if theCommand.upper() == "STORE":
-        keyAndValue = command[1].split("=")
-        #print("[Server] The keyAndValue term is : ", keyAndValue)
-        #Try to store the given key value pair
-        try:           
-            keyValues[keyAndValue[0].upper()] = keyAndValue[1][0:len(keyAndValue[1])-1]
-            return bytes(("Success at storing : key - "+keyAndValue[0]+", value - "
-                          +keyAndValue[1][0:len(keyAndValue[1])-1]), encoding='utf8')
-        except IndexError:
-            return bytes("Invalid key-value pair... try form: STORE __=__", encoding='utf8')
-
-    killMe = True
-    return bytes("Wrong input format, please use: STORE key=value   or    GET key", encoding='utf8') 
-    '''
+    
 
 '''
     Getting the parameters and setting up the roster

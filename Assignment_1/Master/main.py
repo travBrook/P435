@@ -4,188 +4,135 @@ import selectors
 from psutil import process_iter
 from signal import SIGTERM
 import time
-#import rpyc
-
-#conn = rpyc.classic.connect("localhost")
-
-
-'''
-    Get new clusterID
-'''
 
 clusterID = 0
 startingHost = "127.0.0.1"
 startingPort = "65431"
 
 rosterDict = {}
+numberOfMappers = 0
+numberOfReducers = 0
 
+def runMapRed(inputData, mapFn, redFn, outputLoc) : 
 
-sel = selectors.DefaultSelector()
+    '''
+        Retrieve the data and split it up evenly for the 
+        amount of mappers. 
+        Just going to split by the number of lines for now.
+        A bit of a bottleNeck, but less file access needed
+    '''
+    try:
+        pass
+        f = open(inputData, "r")
+        lines = f.readlines()
+        f.close()
+    except IOError:
+        pass
+        print("The file doesn't exist friend...")
+        sys.exit(1)
 
-notReady = False
+    n = len(lines)
+    mappersShare = int(n/numberOfMappers)
 
-def init_Clusters():
+    chunks = []
+    for i in range(0, numberOfMappers):
+        pass
+        thisChunk = ""
+        for j in range(0, mappersShare):
+            line = lines.pop(0).replace("\n", " ")
+            thisChunk = thisChunk + line
+        chunks.append(thisChunk)
 
 
     '''
-        DO A CHECK THAT EVERYONE IS RESPONDING 
+        Spawn the master receiver to receive okays from 
+        completed mappers. Master will respond with host/ports 
+        of reducers and the function
     '''
-    
-    '''
-        Spawn a master receiver  
-        This receiver receives messages from Mapper and Reducer
-        senders that will signal the mapper and reducer servers 
-        are awaiting action.
     '''
     ok = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
     startingHost, startingPort, str(numberOfMappers), str(numberOfReducers)], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-
-    
-    #time.sleep(3)
-    
     '''
-        Spawn the mappers and reducers
-        This is the only part that currently doesn't use 
-        network based communications -- this is because
-        it is easier to test locally. 
-    '''    
-    for i in range(0, numberOfMappers): 
+
+    '''
+        Spawn master dataTraders for each mapper.  
+        give these traders the data, mapper host/port, 
+        and the corrsponding reducer host/port
+    '''
+    
+    for i in range(0, numberOfMappers):
+        mapperHost, mapperPort = rosterDict["Mapper" + str(i)]
+        if i >= numberOfReducers : 
+            reducerHost, reducerPort = rosterDict["Reducer" + str(i-numberOfReducers)]
+        else: 
+            reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/main.py', startingHost, startingPort, str(i)])
-
-    for i in range(0, numberOfReducers):
-        subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/main.py', startingHost, startingPort, str(i)])
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataTrader.py',
+        mapperHost, mapperPort, chunks[i], reducerHost, reducerPort, mapFn])
 
 
     '''
-        Get mapping of ips and ports (wait 10 seconds until fail)
-        We communicate to the master reciever process that we spawned
-        above. Its stdout is piped to the communicate() method.
-        Once the server is done collecting data from the Mappers/Reducers,
-        we are allowed to continue
+        ef
     '''
-    outs = ok.communicate(input=bytes("Hello buddy", encoding='utf8'),timeout=10)[0]
-    #Stripping and splitting below ... 
-    output = repr(outs)[2:len(repr(outs))-1] 
-    output = output.replace('\\r', '')
-    output = output.replace('\\n', '')
-    output = output[0:len(output)-1]
-    newMapReds = output.split(" ")
-    #Put the clean data into the dictionary
-    while len(newMapReds) != 0:
-        name = newMapReds.pop(0)
-        ip = newMapReds.pop(0)
-        portNum = newMapReds.pop(0)
-        rosterDict[name] = (ip, portNum)
-
-    print("The roster is : " + str(rosterDict))
-
-    status = ok.wait(timeout=10)
-
-    #If everything went according to plan, we signal we're ready.
-    if status == 0:
-        print("READY!")
-        return clusterID + 1
-    else :   
-        print("OUCH!")
-
-'''
-    This function writes the roster of mappers and reducers to a local file
-'''
-def reportRoster():
-
-    f = open("clusters.txt", "+a")    
-    clusterString = str(clusterID) + " " + str(rosterDict) + "\n"
-    f.write(clusterString)
-    f.close()
 
 
 '''
-    This function inializes the roster dictionary
+    Gets the roster from the text file created
+    by the initialization given the cluster id.
 '''
-def initRoster():
-
-    for i in range(0,numberOfMappers): 
-        pass
-        rosterDict["Mapper" + str(i)] = ''
-
-    for i in range(0,numberOfReducers):
-        pass
-        rosterDict["Reducer" + str(i)] = ''
-
-'''
-    Gets cluster id. -- based on the previously highest clusterid.
-
-'''
-def getClusterID():
-    
+def initRoster() :
+    pass
     f = open("clusters.txt", "r")
     lines = f.readlines()
     f.close()
-    high = 0
     for line in lines:
         clusID = int(line[0:2])
-        if clusID > high:
-            high = clusID
-    
-    return high
-
-
-
-def runMapRed(inputData, mapFn, redFn, outputLoc) : 
-
-    print("Howdy doody")
+        if clusID == clusterID:
+            theLine = line[2:len(line)]
+            return eval(theLine)
+            
+'''
+    Counts the number of mappers/reducers on the 
+    roster.
+'''
+def countEm():
+    pass
+    numberOfMappers = 0
+    numberOfReducers = 0
+    for key in rosterDict.keys():
+        #taken from stack exchange https://stackoverflow.com/questions/12851791/removing-numbers-from-string
+        mapOrRed = ''.join([i for i in key if not i.isdigit()]) 
+        if mapOrRed == "Mapper" :
+            numberOfMappers += 1
+        if mapOrRed == "Reducer" :
+            numberOfReducers += 1
+    return (numberOfMappers, numberOfReducers)
 
 
 '''
-    Get command line args and assign
+    Initilization of vars
 '''
-if len(sys.argv) != 3:
-    print("usage:", sys.argv[0], "<number of mappers> <number of reducers>")
+if len(sys.argv) != 6:
+    print("usage:", sys.argv[0], "<inputFileLoc> <map fn> <red fn> <outputFileLoc> <cluster id>")
     sys.exit(1)
 
-numberOfMappers = int(sys.argv[1])
-numberOfReducers = int(sys.argv[2])
-
-'''
-    FOR LOCAL USE
-    Before intitializing, clear ports we want to use...
-'''
-for i in range(0,numberOfMappers) : 
-    
-    for proc in process_iter():
-        for conns in proc.connections(kind='inet'):
-            if conns.laddr.port == (65430-i):
-                proc.send_signal(SIGTERM)
-
-for i in range(0,numberOfReducers) : 
-    
-    for proc in process_iter():
-        for conns in proc.connections(kind='inet'):
-            if conns.laddr.port == (65432+i):
-                proc.send_signal(SIGTERM)
+inputFile = sys.argv[1]
+mapFn = sys.argv[2]
+redFn = sys.argv[3]
+outputFile = sys.argv[4]
+clusterID = int(sys.argv[5])
 
 
 '''
-    Ready the troops
+    First we get the roster
+    Count the amount of mappers/reducers 
 '''
-initRoster()
-init_Clusters()
-clusterID = getClusterID()+1
+rosterDict = initRoster()
+numberOfMappers, numberOfReducers = countEm()
+
 
 '''
-    Write to roster to local file and tell user which cluster to use.
+    Give it a spin!
 '''
-reportRoster()
-print("Please use cluster ID : " + str(clusterID))
-
-
-
-
-
-
-
-
-
+runMapRed(inputFile, mapFn, redFn, outputFile)

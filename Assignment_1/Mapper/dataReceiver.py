@@ -2,15 +2,16 @@ import selectors
 import socket
 import types
 import sys
+import comms_pb2
+
 
 sel = selectors.DefaultSelector()
 
-keyValues = {}
-
+#roster = [] #The roster holds the mappers/reducers that haven't checked in yet
 
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
-    print('[MDRecvr] accepted connection from', addr)
+    #print('[MDReceiver] accepted connection from', addr)
     conn.setblocking(False)
     data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
@@ -23,73 +24,84 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
-            sendBack = addToKeyValue(repr(recv_data))
+            sendBack = mapData(recv_data)
             data.outb += recv_data
         else:
-            print('[MDRecvr] closing connection to', data.addr)
+            #print('[MDReceiver] closing connection to', data.addr)
             sel.unregister(sock)
             sock.close()
     if mask & selectors.EVENT_WRITE:
         if data.outb:
-            #Here is where we send the status or value back to the client
             if (b'Welcome' != sendBack):
                 sent = sock.send(sendBack)  # Should be ready to write
-                print("[MDRecvr] Current key values on server: ", keyValues)
+                #print("[MDReceiver] Current absentees on roster : ", roster)
                 data.outb = data.outb[sent:]
 
+def mapData(s):
+
+    theMapOrRedMessage = comms_pb2.AMessage()
+    theMapOrRedMessage.ParseFromString(s)
+    print(theMapOrRedMessage)
 
 '''
-    Takes user request (GET or STORE) and returns appropriate response
+def createRoster() : 
+
+    for i in range(0, numberOfMappers):
+        roster.append("Mapper" + str(i))
+
+    for i in range(0, numberOfReducers): 
+        roster.append("Reducer" + str(i))
 '''
-def addToKeyValue(s):
+
+'''
+    Receives notice from Mapper or Reducer and removes from roster
+
+def takeAttendance(s):
     
-    #First see if user is storing or getting key-value
-    command = s.split(" ")
-    theCommand = command[0][2:len(command[0])]
+    theMapOrRedMessage = comms_pb2.AMessage()
+    theMapOrRedMessage.ParseFromString(s)
 
-    #If it is a get, return the value given the key or error message
-    if theCommand.upper() == "GET":
-        #Try to get the key value pair. If not found, return error
-        try:
-            theKey = command[1][0:(len(command[1])-1)].upper()
-            theValue = keyValues[theKey]
-            return bytes("The value for key [" + str(theKey) + "] is : " + str(theValue), encoding='utf8')
-        except KeyError:
-            return bytes("ERROR -- KEY NOT FOUND", encoding='utf8')            
+    senderName = theMapOrRedMessage.theSender.name
+    rcvrHost = theMapOrRedMessage.theFriend.host
+    rcvrPort = theMapOrRedMessage.theFriend.port
 
-    #If it is a store, store it in the dictionary
-    if theCommand.upper() == "STORE":
-        keyAndValue = command[1].split("=")
-        #print("[Server] The keyAndValue term is : ", keyAndValue)
-        #Try to store the given key value pair
-        try:           
-            keyValues[keyAndValue[0].upper()] = keyAndValue[1][0:len(keyAndValue[1])-1]
-            return bytes(("Success at storing : key - "+keyAndValue[0]+", value - "
-                          +keyAndValue[1][0:len(keyAndValue[1])-1]), encoding='utf8')
-        except IndexError:
-            return bytes("Invalid key-value pair... try form: STORE __=__", encoding='utf8')
+    print(senderName + " " + rcvrHost + " " + rcvrPort + " ") ### prints to stdout where it is piped to parent
 
-    return bytes("Wrong input format, please use: STORE key=value   or    GET key", encoding='utf8') 
+    if senderName is None :
+        return bytes("OW!", encoding='utf8')
+    roster.remove(senderName)
+    return bytes("Thank you, " + senderName, encoding='utf8')
+'''
 
-
-if len(sys.argv) != 4:
-    print("usage:", sys.argv[0], "<host> <port> <id>")
+'''
+    Getting the parameters and setting up the roster
+'''
+if len(sys.argv) != 5:
+    print("usage:", sys.argv[0], "<host> <port> <id> <mapFn>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = int(sys.argv[2])
+#numberOfMappers = int(sys.argv[3])
+#numberOfReducers = int(sys.argv[4])
+#createRoster()
 
-
-#Socket set up
+'''
+    Socket set up
+'''
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 lsock.bind((host, port))
 lsock.listen()
-print("[MDRecvr] listening on", (host, port))
+#print("[OKServer] listening on", (host, port))
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
+
+'''
+    We only terminate when everyone on the roster has been checked off
+'''
 try:
-    while True:
+    while len(roster) != 0:
         events = sel.select(timeout=None)
         for key, mask in events:
             if key.data is None:
@@ -97,7 +109,9 @@ try:
             else:
                 service_connection(key, mask)
 except KeyboardInterrupt:
-    print("[MDRecvr] caught keyboard interrupt, exiting")
+    print("[OKServer] caught keyboard interrupt, exiting")
 finally:
-    print("[MDRecvr] FINALLY")
+    #print("[OKServer] FINALLY")
+    #print(repr(sys.stdin))
+    #print(sys.stdin.readline())
     sel.close()

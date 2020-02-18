@@ -17,14 +17,18 @@ def main() :
     '''
     
     rcvr = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/dataReceiver.py', receiverHost, str(receiverPort), mapID])
+    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/dataReceiver.py', 
+    receiverHost, str(receiverPort), mapID, "placeholder"])
 
     time.sleep(4)
 
     if rcvr.poll() is None : 
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/sender.py', startingHost, startingPort, mapID, receiverHost, str(receiverPort)])
-    else : sys.exit(1)
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/sender.py',
+        startingHost, startingPort, mapID, receiverHost, str(receiverPort)])
+    else :
+        print("Mapper" + str(mapID) + "had trouble starting")
+        sys.exit(1)
 
 
 if len(sys.argv) != 4:

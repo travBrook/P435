@@ -7,15 +7,6 @@ import comms_pb2
 
 sel = selectors.DefaultSelector()
 
-'''
-    To run this program:
-    >python bob.py args
-    where args has the form of either:
-    STORE [key]=[value]
-    or
-    GET [key]
-'''
-
 def start_connections(host, port):
 
     server_addr = (host, port)
