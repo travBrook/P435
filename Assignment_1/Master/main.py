@@ -9,6 +9,10 @@ import time
 #conn = rpyc.classic.connect("localhost")
 
 
+'''
+    Get new clusterID
+'''
+
 clusterID = 0
 startingHost = "127.0.0.1"
 startingPort = "65431"
@@ -28,19 +32,23 @@ def init_Clusters():
     '''
     
     '''
-        Spawn the master receiver  
+        Spawn a master receiver  
+        This receiver receives messages from Mapper and Reducer
+        senders that will signal the mapper and reducer servers 
+        are awaiting action.
     '''
     ok = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
     startingHost, startingPort, str(numberOfMappers), str(numberOfReducers)], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
-    time.sleep(3)
-
-    #subprocess.Popen(['echo' , '%cd%'], cwd='../', shell=True)
-
+    
+    #time.sleep(3)
     
     '''
         Spawn the mappers and reducers
+        This is the only part that currently doesn't use 
+        network based communications -- this is because
+        it is easier to test locally. 
     '''    
     for i in range(0, numberOfMappers): 
         subprocess.Popen(['python.exe', 
@@ -53,18 +61,19 @@ def init_Clusters():
 
     '''
         Get mapping of ips and ports (wait 10 seconds until fail)
+        We communicate to the master reciever process that we spawned
+        above. Its stdout is piped to the communicate() method.
+        Once the server is done collecting data from the Mappers/Reducers,
+        we are allowed to continue
     '''
-    outs = ok.communicate(input=bytes("Hewoah", encoding='utf8'),timeout=10)[0]
-    output = repr(outs)[2:len(repr(outs))-1]
+    outs = ok.communicate(input=bytes("Hello buddy", encoding='utf8'),timeout=10)[0]
+    #Stripping and splitting below ... 
+    output = repr(outs)[2:len(repr(outs))-1] 
     output = output.replace('\\r', '')
     output = output.replace('\\n', '')
-    print(output)
     output = output[0:len(output)-1]
-
-
     newMapReds = output.split(" ")
-    print(newMapReds)
-
+    #Put the clean data into the dictionary
     while len(newMapReds) != 0:
         name = newMapReds.pop(0)
         ip = newMapReds.pop(0)
@@ -73,25 +82,29 @@ def init_Clusters():
 
     print("The roster is : " + str(rosterDict))
 
-
     status = ok.wait(timeout=10)
 
-
-
-    #Sleep not necessary, but keeps output clean
-    #time.sleep(3)
-
+    #If everything went according to plan, we signal we're ready.
     if status == 0:
         print("READY!")
         return clusterID + 1
     else :   
         print("OUCH!")
 
+'''
+    This function writes the roster of mappers and reducers to a local file
+'''
+def reportRoster():
 
-def runMapRed(inputData, mapFn, redFn, outputLoc) : 
+    f = open("clusters.txt", "+a")    
+    clusterString = str(clusterID) + " " + str(rosterDict) + "\n"
+    f.write(clusterString)
+    f.close()
 
-    print("Howdy doody")
 
+'''
+    This function inializes the roster dictionary
+'''
 def initRoster():
 
     for i in range(0,numberOfMappers): 
@@ -102,10 +115,36 @@ def initRoster():
         pass
         rosterDict["Reducer" + str(i)] = ''
 
+'''
+    Gets cluster id. -- based on the previously highest clusterid.
+
+'''
+def getClusterID():
+    
+    f = open("clusters.txt", "r")
+    lines = f.readlines()
+    f.close()
+    high = 0
+    for line in lines:
+        clusID = int(line[0:2])
+        if clusID > high:
+            high = clusID
+    
+    return high
+
+
+
+def runMapRed(inputData, mapFn, redFn, outputLoc) : 
+
+    print("Howdy doody")
+
+
+'''
+    Get command line args and assign
+'''
 if len(sys.argv) != 3:
     print("usage:", sys.argv[0], "<number of mappers> <number of reducers>")
     sys.exit(1)
-
 
 numberOfMappers = int(sys.argv[1])
 numberOfReducers = int(sys.argv[2])
@@ -133,10 +172,20 @@ for i in range(0,numberOfReducers) :
     Ready the troops
 '''
 initRoster()
-aCluster = init_Clusters()
-
+init_Clusters()
+clusterID = getClusterID()+1
 
 '''
-    Prompt for user input to get input file/output location, and map/red functions
+    Write to roster to local file and tell user which cluster to use.
 '''
+reportRoster()
+print("Please use cluster ID : " + str(clusterID))
+
+
+
+
+
+
+
+
 
