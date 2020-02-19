@@ -43,6 +43,12 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         for j in range(0, mappersShare):
             line = lines.pop(0).replace("\n", " ")
             thisChunk = thisChunk + line
+
+        #The last mapper might take a few extra lines...
+        if i == numberOfMappers-1:
+            for line in lines :
+                line = lines.pop(0).replace("\n", " ")
+                thisChunk = thisChunk + line
         chunks.append(thisChunk)
 
 
@@ -62,6 +68,8 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         give these traders the data, mapper host/port, 
         and the corrsponding reducer host/port
     '''
+
+    relayers = []
     
     for i in range(0, numberOfMappers):
         mapperHost, mapperPort = rosterDict["Mapper" + str(i)]
@@ -71,11 +79,13 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
 
         
-        relayers = subprocess.Popen(['python.exe', 
+        relayer = subprocess.Popen(['python.exe', 
         'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
-        mapperHost, mapperPort, "chunks[i]", reducerHost, reducerPort, mapFn], stdin=subprocess.PIPE)
+        mapperHost, mapperPort, reducerHost, reducerPort, mapFn], stdin=subprocess.PIPE)
 
-        outs = relayers.communicate(input=bytes(chunks[i], encoding='utf8'),timeout=15)[0]
+        # The line below will make us wait till it the child terminates... 
+        # Can we write directly to stdin for the child process? 
+        relayer.stdin.write((bytes(chunks[i], encoding='utf8')))
 
     '''
         ef

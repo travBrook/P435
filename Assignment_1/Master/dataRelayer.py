@@ -54,8 +54,8 @@ def service_connection(key, mask):
 
 
 
-if len(sys.argv) != 7:
-    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <data> <reducerHost> <reducerPort> <mapFn>")
+if len(sys.argv) != 6:
+    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <reducerHost> <reducerPort> <mapFn>")
     sys.exit(1)
 
 host = sys.argv[1]
@@ -68,11 +68,12 @@ thisMessage = comms_pb2.AMessage()
 #thisMessage.theSender.host = port
 #thisMessage.theSender.port = host
 
+#print(sys.stdin.readline())
 thisMessage.data = sys.stdin.readline()
 thisMessage.theFriend.name = "RDRcvr"
-thisMessage.theFriend.host = sys.argv[4]
-thisMessage.theFriend.port = sys.argv[5]
-thisMessage.functionFileName = sys.argv[6]
+thisMessage.theFriend.host = sys.argv[3]
+thisMessage.theFriend.port = sys.argv[4]
+thisMessage.functionFileName = sys.argv[5]
 
 finalMessage = thisMessage.SerializeToString()
 messages = [finalMessage]

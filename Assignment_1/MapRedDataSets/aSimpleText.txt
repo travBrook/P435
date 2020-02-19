@@ -1,0 +1,7 @@
+This is my own example of a text you might see some day.
+This uses only utf8, which is nice.
+I was running into problems using things like the other 
+text files in this directory. I wonder if a Capital is 
+considered differently than a capital using my current 
+algorithm.... I'm excited to see how it handles the dots too.
+Maybe I should provision for the different kinds of sy,mbols

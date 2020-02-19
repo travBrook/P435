@@ -41,7 +41,7 @@ def mapData(s):
 
     theMapOrRedMessage = comms_pb2.AMessage()
     theMapOrRedMessage.ParseFromString(s)
-    print(theMapOrRedMessage)
+    #print(theMapOrRedMessage)
     return bytes("Thank you, i'll handle this, master", encoding='utf8')
 
 '''
