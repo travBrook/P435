@@ -18,7 +18,7 @@ def main() :
     
     rcvr = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/dataReceiver.py', 
-    receiverHost, str(receiverPort), mapID, "placeholder"])
+    receiverHost, str(receiverPort), mapID])
 
     time.sleep(4)
 

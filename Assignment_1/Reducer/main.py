@@ -26,7 +26,9 @@ def main() :
     if rcvr.poll() is None : 
         subprocess.Popen(['python.exe', 
         'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/sender.py', startingHost, startingPort, redID, receiverHost, str(receiverPort)])
-    else : sys.exit(1)
+    else : 
+        print("Reducer" + str(redID) + "had trouble starting")
+        sys.exit(1)
 
 
 if len(sys.argv) != 4:

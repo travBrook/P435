@@ -62,7 +62,9 @@ def takeAttendance(s):
     print(senderName + " " + rcvrHost + " " + rcvrPort + " ") ### prints to stdout where it is piped to parent
 
     if senderName is None :
-        return bytes("OW!", encoding='utf8')
+        print("The senders name was none!")
+        sys.exit(1)
+        #return bytes("OW!", encoding='utf8')
     roster.remove(senderName)
     return bytes("Thank you, " + senderName, encoding='utf8')
     

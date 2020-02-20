@@ -1,0 +1,6 @@
+
+#For initializing 
+python "C:\Users\T Baby\Documents\GitHub\P435\Assignment_1\Master\init.py" 2 2
+
+#For running map reduce
+python "C:\Users\T Baby\Documents\GitHub\P435\Assignment_1\Master\main.py" "C:\Users\T Baby\Documents\GitHub\P435\Assignment_1\MapRedDataSets\aSimpleText.txt" blah blah blah 44

@@ -36,7 +36,7 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
-            print("[dataRelayer] received", repr(recv_data), "from the server")
+            #print("[dataRelayer] received", repr(recv_data), "from the server")
             data.recv_total += len(recv_data)
         if not recv_data or data.recv_total == data.msg_total:
             #print("[Mapper] closing connection to server")
@@ -63,12 +63,6 @@ port = sys.argv[2]
 #mapID = sys.argv[3]
 
 thisMessage = comms_pb2.AMessage()
-
-#thisMessage.theSender.name = "Mapper" + mapID
-#thisMessage.theSender.host = port
-#thisMessage.theSender.port = host
-
-#print(sys.stdin.readline())
 thisMessage.data = sys.stdin.readline()
 thisMessage.theFriend.name = "RDRcvr"
 thisMessage.theFriend.host = sys.argv[3]
@@ -92,4 +86,5 @@ try:
 except KeyboardInterrupt:
     print("[dataRelayer] caught keyboard interrupt, exiting")
 finally:
+    print("Ready")
     sel.close()

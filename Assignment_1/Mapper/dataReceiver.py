@@ -2,12 +2,13 @@ import selectors
 import socket
 import types
 import sys
+import subprocess
 import comms_pb2
 
 
 sel = selectors.DefaultSelector()
 
-#roster = [] #The roster holds the mappers/reducers that haven't checked in yet
+isMapped = ['blah']
 
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
@@ -39,20 +40,31 @@ def service_connection(key, mask):
 
 def mapData(s):
 
-    theMapOrRedMessage = comms_pb2.AMessage()
-    theMapOrRedMessage.ParseFromString(s)
-    #print(theMapOrRedMessage)
+    masterMessage = comms_pb2.AMessage()
+    masterMessage.ParseFromString(s)
+    #print(masterMessage)
+
+    aMapping = subprocess.Popen(['python.exe', 
+    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/wordCount_map.py'], 
+    stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    aMapping.stdin.write(bytes(masterMessage.data, encoding='utf8'))
+    outs, errs = aMapping.communicate(timeout=10)
+    #print("BBBLAHHHH : " + repr(outs))
+    theData = repr(outs)[2:len(repr(outs))-1].replace('\\n', '')
+    theData = theData.replace('\\r', '')
+    theReducerHost = masterMessage.theFriend.host
+    theReducerPort = masterMessage.theFriend.port
+
+    
+
+    isMapped.pop(0)
+
     return bytes("Thank you, i'll handle this, master", encoding='utf8')
 
-'''
-def createRoster() : 
 
-    for i in range(0, numberOfMappers):
-        roster.append("Mapper" + str(i))
+#def createBool() : 
+#    isMapped.append("blah")
 
-    for i in range(0, numberOfReducers): 
-        roster.append("Reducer" + str(i))
-'''
 
 '''
     Receives notice from Mapper or Reducer and removes from roster
@@ -77,15 +89,15 @@ def takeAttendance(s):
 '''
     Getting the parameters and setting up the roster
 '''
-if len(sys.argv) != 5:
-    print("usage:", sys.argv[0], "<host> <port> <id> <mapFn>")
+if len(sys.argv) != 4:
+    print("usage:", sys.argv[0], "<host> <port> <id>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = int(sys.argv[2])
 #numberOfMappers = int(sys.argv[3])
 #numberOfReducers = int(sys.argv[4])
-#createRoster()
+#createBool()
 
 '''
     Socket set up
@@ -102,7 +114,7 @@ sel.register(lsock, selectors.EVENT_READ, data=None)
     We only terminate when everyone on the roster has been checked off
 '''
 try:
-    while True:
+    while len(isMapped) != 0:
         events = sel.select(timeout=None)
         for key, mask in events:
             if key.data is None:
@@ -112,7 +124,7 @@ try:
 except KeyboardInterrupt:
     print("[MDRecvr] caught keyboard interrupt, exiting")
 finally:
-    #print("[OKServer] FINALLY")
+    print("[MDRecvr] FINALLY")
     #print(repr(sys.stdin))
     #print(sys.stdin.readline())
     sel.close()

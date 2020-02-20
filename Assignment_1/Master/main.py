@@ -4,6 +4,8 @@ import selectors
 from psutil import process_iter
 from signal import SIGTERM
 import time
+from threading import Thread 
+import select
 
 clusterID = 0
 startingHost = "127.0.0.1"
@@ -44,7 +46,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             line = lines.pop(0).replace("\n", " ")
             thisChunk = thisChunk + line
 
-        #The last mapper might take a few extra lines...
+        #The last mapper might take a few extra lines....
         if i == numberOfMappers-1:
             for line in lines :
                 line = lines.pop(0).replace("\n", " ")
@@ -64,28 +66,77 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
     '''
 
     '''
-        Spawn master dataTraders for each mapper.  
+        Spawn master dataRelayers for each mapper.  
         give these traders the data, mapper host/port, 
         and the corrsponding reducer host/port
     '''
 
     relayers = []
-    
+
+    ###We start by distributing the mappers to the different reducers    
     for i in range(0, numberOfMappers):
         mapperHost, mapperPort = rosterDict["Mapper" + str(i)]
         if i >= numberOfReducers : 
             reducerHost, reducerPort = rosterDict["Reducer" + str(i-numberOfReducers)]
         else: 
             reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
-
-        
+        ###Start a relayer 
         relayer = subprocess.Popen(['python.exe', 
         'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
-        mapperHost, mapperPort, reducerHost, reducerPort, mapFn], stdin=subprocess.PIPE)
+        mapperHost, mapperPort, reducerHost, reducerPort, mapFn], 
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
-        # The line below will make us wait till it the child terminates... 
-        # Can we write directly to stdin for the child process? 
+        ###Send the chunk to them
         relayer.stdin.write((bytes(chunks[i], encoding='utf8')))
+        ###Keep track of the relayers to see if all finished
+        relayers.append(relayer)
+
+    '''
+    Below is code from stackexchange to read
+    continuously from stdout of the child process
+    without blocking. https://stackoverflow.com/questions/36476841/python-how-to-read-stdout-of-subprocess-in-a-nonblocking-way/36477512
+    I tried using POpen.poll()
+    on the subprocess, but this was futile.
+    When a process takes a while to complete,
+    POpen.poll() will always return none (known issue)
+    '''
+    for relayer in relayers : 
+        outs, status = relayer.communicate(timeout=7)
+        output = repr(outs)[2:len(repr(outs))-1] 
+        output = output.replace('\\r', '')
+        output = output.replace('\\n', '')
+        if output == "Ready":
+            print("READY!")
+        else :   
+            print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
+
+    ###See if all the relayers finished
+    ####Fail after 15 seconds
+    '''
+    startTime = time.time()
+    while len(relayers) != 0 : 
+        for i in range(0,len(relayers)):
+            status = relayers[i].stdout.read()
+            print(status)
+            if status == " ":
+                if int(time.time() - startTime) >= 15 :
+                    print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
+                    sys.exit(1)
+                continue
+            if status == "Ready" :
+                relayers.pop(i)
+    '''
+    '''
+            if status != 0:
+                print(status)
+                print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
+                sys.exit(1)
+    '''
+    '''
+            if int(time.time() - startTime) >= 15 :
+                    print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
+                    sys.exit(1)
+    '''
 
     '''
         ef

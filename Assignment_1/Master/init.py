@@ -75,10 +75,14 @@ def init_Clusters():
     newMapReds = output.split(" ")
     #Put the clean data into the dictionary
     while len(newMapReds) != 0:
-        name = newMapReds.pop(0)
-        ip = newMapReds.pop(0)
-        portNum = newMapReds.pop(0)
-        rosterDict[name] = (ip, portNum)
+        try:
+            name = newMapReds.pop(0)
+            ip = newMapReds.pop(0)
+            portNum = newMapReds.pop(0)
+            rosterDict[name] = (ip, portNum)
+        except IndexError: 
+            print("Initialization problem... please try again")
+            sys.exit(1)
 
     print("The roster is : " + str(rosterDict))
 
