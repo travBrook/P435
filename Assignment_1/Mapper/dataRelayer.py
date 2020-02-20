@@ -4,9 +4,13 @@ import selectors
 import types
 import time
 import comms_pb2
-import msvcrt
 
 sel = selectors.DefaultSelector()
+
+'''
+    Call this to give a mapper its data and give the mapper
+    its corresponding reducer as well as the map fn
+'''
 
 def start_connections(host, port):
 
@@ -17,7 +21,7 @@ def start_connections(host, port):
     sock.connect_ex(server_addr)
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     data = types.SimpleNamespace(
-        connid="Mapper",
+        connid="dataRelayer",
         msg_total=sum(len(m) for m in messages),
         recv_total=0,
         messages=list(messages),
@@ -32,7 +36,7 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
-            #print("[Mapper] received", repr(recv_data), "from the server")
+            #print("[dataRelayer] received", repr(recv_data), "from the server")
             data.recv_total += len(recv_data)
         if not recv_data or data.recv_total == data.msg_total:
             #print("[Mapper] closing connection to server")
@@ -51,27 +55,22 @@ def service_connection(key, mask):
 
 
 if len(sys.argv) != 6:
-    print("usage:", sys.argv[0], "<host> <port> <id> <rec host> <rec port>")
+    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <reducerHost> <reducerPort> <mapFn>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = sys.argv[2]
-mapID = sys.argv[3]
+#mapID = sys.argv[3]
 
 thisMessage = comms_pb2.AMessage()
 thisMessage.data = sys.stdin.readline()
-
-thisMessage.theSender.name = "Mapper" + mapID
-thisMessage.theSender.host = port
-thisMessage.theSender.port = host
-thisMessage.theFriend.name = "MDRcvr" + mapID
-thisMessage.theFriend.host = sys.argv[4]
-thisMessage.theFriend.port = sys.argv[5]
-print("Mapper message  : \n", thisMessage.data)
+thisMessage.theFriend.name = "RDRcvr"
+thisMessage.theFriend.host = sys.argv[3]
+thisMessage.theFriend.port = sys.argv[4]
+thisMessage.functionFileName = sys.argv[5]
 
 finalMessage = thisMessage.SerializeToString()
 messages = [finalMessage]
-
 
 start_connections(host, int(port))
 
@@ -85,6 +84,7 @@ try:
         if not sel.get_map():
             break
 except KeyboardInterrupt:
-    print("[Mapper] caught keyboard interrupt, exiting")
+    print("[dataRelayer] caught keyboard interrupt, exiting")
 finally:
+    print("Ready")
     sel.close()

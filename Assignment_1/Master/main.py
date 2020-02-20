@@ -59,6 +59,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         completed mappers. Master will respond with host/ports 
         of reducers and the function
     '''
+
     '''
     ok = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
@@ -91,17 +92,10 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         ###Keep track of the relayers to see if all finished
         relayers.append(relayer)
 
-    '''
-    Below is code from stackexchange to read
-    continuously from stdout of the child process
-    without blocking. https://stackoverflow.com/questions/36476841/python-how-to-read-stdout-of-subprocess-in-a-nonblocking-way/36477512
-    I tried using POpen.poll()
-    on the subprocess, but this was futile.
-    When a process takes a while to complete,
-    POpen.poll() will always return none (known issue)
-    '''
+
+    #We'll wait 5 seconds to hear back from each relayer
     for relayer in relayers : 
-        outs, status = relayer.communicate(timeout=7)
+        outs, status = relayer.communicate(timeout=5)
         output = repr(outs)[2:len(repr(outs))-1] 
         output = output.replace('\\r', '')
         output = output.replace('\\n', '')
@@ -110,36 +104,12 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         else :   
             print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
 
-    ###See if all the relayers finished
-    ####Fail after 15 seconds
-    '''
-    startTime = time.time()
-    while len(relayers) != 0 : 
-        for i in range(0,len(relayers)):
-            status = relayers[i].stdout.read()
-            print(status)
-            if status == " ":
-                if int(time.time() - startTime) >= 15 :
-                    print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
-                    sys.exit(1)
-                continue
-            if status == "Ready" :
-                relayers.pop(i)
-    '''
-    '''
-            if status != 0:
-                print(status)
-                print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
-                sys.exit(1)
-    '''
-    '''
-            if int(time.time() - startTime) >= 15 :
-                    print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
-                    sys.exit(1)
-    '''
+
+
 
     '''
-        ef
+        JUST SEND TO REDUCER SERVER 
+        but when?! perhaps just set a timeout for 45 seconds?
     '''
 
 

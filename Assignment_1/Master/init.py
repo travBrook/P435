@@ -152,11 +152,15 @@ numberOfReducers = int(sys.argv[2])
 '''
 
 for i in range(0,numberOfMappers) : 
-    
+    port = 65430-i
     for proc in process_iter():
         for conns in proc.connections(kind='inet'):
-            if conns.laddr.port == (65430-i):
-                proc.send_signal(SIGTERM)
+            if conns.laddr.port == (port):
+                try:
+                    proc.send_signal(SIGTERM)
+                except psutil.AccessDenied.omg:  # windows
+                    print(str(port) + " to be deleted")
+                
 
 for i in range(0,numberOfReducers) : 
     

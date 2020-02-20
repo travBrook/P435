@@ -18,8 +18,10 @@ message AMessage{
     optional string name = 1;
     optional string host = 2;
     optional string port = 3;
+    optional string range = 4;
   }
 
-  optional InfoOnOther theFriend = 4;
+  repeated InfoOnOther others = 4;
+  optional InfoOnOther theFriend = 5;
 
 }

@@ -55,36 +55,11 @@ def mapData(s):
     theReducerHost = masterMessage.theFriend.host
     theReducerPort = masterMessage.theFriend.port
 
-    
-
+    toBeSent = theData + "vxyxv" + theReducerHost + "vxyxv" + theReducerPort
+    print(toBeSent)
     isMapped.pop(0)
 
     return bytes("Thank you, i'll handle this, master", encoding='utf8')
-
-
-#def createBool() : 
-#    isMapped.append("blah")
-
-
-'''
-    Receives notice from Mapper or Reducer and removes from roster
-
-def takeAttendance(s):
-    
-    theMapOrRedMessage = comms_pb2.AMessage()
-    theMapOrRedMessage.ParseFromString(s)
-
-    senderName = theMapOrRedMessage.theSender.name
-    rcvrHost = theMapOrRedMessage.theFriend.host
-    rcvrPort = theMapOrRedMessage.theFriend.port
-
-    print(senderName + " " + rcvrHost + " " + rcvrPort + " ") ### prints to stdout where it is piped to parent
-
-    if senderName is None :
-        return bytes("OW!", encoding='utf8')
-    roster.remove(senderName)
-    return bytes("Thank you, " + senderName, encoding='utf8')
-'''
 
 '''
     Getting the parameters and setting up the roster
@@ -105,7 +80,7 @@ port = int(sys.argv[2])
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 lsock.bind((host, port))
 lsock.listen()
-print("[MDRecvr] listening on", (host, port))
+#print("[MDRecvr] listening on", (host, port))
 lsock.setblocking(False)
 sel.register(lsock, selectors.EVENT_READ, data=None)
 
@@ -124,7 +99,7 @@ try:
 except KeyboardInterrupt:
     print("[MDRecvr] caught keyboard interrupt, exiting")
 finally:
-    print("[MDRecvr] FINALLY")
+    #print("[MDRecvr] FINALLY")
     #print(repr(sys.stdin))
     #print(sys.stdin.readline())
     sel.close()

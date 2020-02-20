@@ -18,18 +18,42 @@ def main() :
     
     rcvr = subprocess.Popen(['python.exe', 
     'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/dataReceiver.py', 
-    receiverHost, str(receiverPort), mapID])
+    receiverHost, str(receiverPort), mapID], stdout=subprocess.PIPE)
 
-    time.sleep(4)
+    time.sleep(1)
 
     if rcvr.poll() is None : 
-        subprocess.Popen(['python.exe', 
+        sender = subprocess.Popen(['python.exe', 
         'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/sender.py',
-        startingHost, startingPort, mapID, receiverHost, str(receiverPort)])
+        startingHost, startingPort, mapID, receiverHost, str(receiverPort)], stdin=subprocess.PIPE)
+        time.sleep(2)
+        sender.communicate((bytes("", encoding='utf8')))    
     else :
         print("Mapper" + str(mapID) + "had trouble starting")
         sys.exit(1)
 
+    outs, errs = rcvr.communicate(timeout=45)
+    #rcvr.wait()
+    
+    #print(repr(outs))
+    everything = repr(outs)[2:len(repr(outs))-1].replace('\\n', '')
+    theGoods = everything.replace('\\r', '').split('vxyxv')
+    #print(theGoods)
+    #mappedData = eval(theGoods[0][1:len(theGoods[0])-1])
+    reducerServer = theGoods[1]
+    reducerHost = theGoods[2]
+
+
+    '''
+        Once we have the mappedData, we create senders to send
+        this data to the reducer servers
+    '''
+    sender = subprocess.Popen(['python.exe', 
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/sender.py',
+        reducerServer, reducerHost, mapID, receiverHost, str(receiverPort)], stdin=subprocess.PIPE)
+
+    sender.communicate(bytes(theGoods[0][1:len(theGoods[0])-1], encoding='utf8'))
+    
 
 if len(sys.argv) != 4:
     print("usage:", sys.argv[0], "<host> <port> <id>")

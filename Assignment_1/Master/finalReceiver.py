@@ -11,8 +11,6 @@ sel = selectors.DefaultSelector()
 keyValues = {}
 
 
-
-
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
     print('[Server] accepted connection from', addr)
