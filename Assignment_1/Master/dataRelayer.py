@@ -54,20 +54,26 @@ def service_connection(key, mask):
 
 
 
-if len(sys.argv) != 6:
-    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <reducerHost> <reducerPort> <mapFn>")
+if len(sys.argv) != 5:
+    print("usage:", sys.argv[0], "<mapperHost> <mapperPort> <reducers> <mapFn>")
     sys.exit(1)
 
 host = sys.argv[1]
 port = sys.argv[2]
-#mapID = sys.argv[3]
 
 thisMessage = comms_pb2.AMessage()
 thisMessage.data = sys.stdin.readline()
-thisMessage.theFriend.name = "RDRcvr"
-thisMessage.theFriend.host = sys.argv[3]
-thisMessage.theFriend.port = sys.argv[4]
-thisMessage.functionFileName = sys.argv[5]
+reducers = eval(sys.argv[3][1:len(sys.argv[3])-1])
+#print(reducers)
+for reducer in reducers :
+    pass
+    red = thisMessage.others.add()
+    red.name = "RDRcvr"
+    red.host = reducer[0]
+    red.port = reducer[1]
+    red.range = ("(" + str(reducer[2][0]) + ", " + str(reducer[2][1]) + ")")
+
+thisMessage.functionFileName = sys.argv[4]
 
 finalMessage = thisMessage.SerializeToString()
 messages = [finalMessage]
@@ -86,5 +92,5 @@ try:
 except KeyboardInterrupt:
     print("[dataRelayer] caught keyboard interrupt, exiting")
 finally:
-    print("Ready")
+    print("Delivered")
     sel.close()

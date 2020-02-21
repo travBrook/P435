@@ -51,7 +51,7 @@ def service_connection(key, mask):
 
 
 if len(sys.argv) != 6:
-    print("usage:", sys.argv[0], "<host> <port> <id> <rec host> <rec port>")
+    print("usage:", sys.argv[0], "<host> <port> <id> <rec host/start range> <rec port/ end range>")
     sys.exit(1)
 
 host = sys.argv[1]
@@ -67,7 +67,7 @@ thisMessage.theSender.port = host
 thisMessage.theFriend.name = "MDRcvr" + mapID
 thisMessage.theFriend.host = sys.argv[4]
 thisMessage.theFriend.port = sys.argv[5]
-print("Mapper message  : \n", thisMessage.data)
+print("Mapper data  : \n", thisMessage.data)
 
 finalMessage = thisMessage.SerializeToString()
 messages = [finalMessage]

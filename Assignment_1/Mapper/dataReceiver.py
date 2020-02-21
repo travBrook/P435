@@ -52,10 +52,12 @@ def mapData(s):
     #print("BBBLAHHHH : " + repr(outs))
     theData = repr(outs)[2:len(repr(outs))-1].replace('\\n', '')
     theData = theData.replace('\\r', '')
-    theReducerHost = masterMessage.theFriend.host
-    theReducerPort = masterMessage.theFriend.port
+    theReducers = masterMessage.others
+    protoHelper = []
+    for reducer in theReducers:
+        protoHelper.append([[reducer.host,reducer.port], reducer.range])
 
-    toBeSent = theData + "vxyxv" + theReducerHost + "vxyxv" + theReducerPort
+    toBeSent = theData + "vxyxv" + str(protoHelper)
     print(toBeSent)
     isMapped.pop(0)
 
@@ -70,9 +72,6 @@ if len(sys.argv) != 4:
 
 host = sys.argv[1]
 port = int(sys.argv[2])
-#numberOfMappers = int(sys.argv[3])
-#numberOfReducers = int(sys.argv[4])
-#createBool()
 
 '''
     Socket set up

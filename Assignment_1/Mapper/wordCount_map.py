@@ -4,12 +4,13 @@ import string
 def mapChunk(chunk):
     pass
     for char in string.punctuation:
-        #print(char)
         chunk = chunk.replace(char, '')
+
     theWords = chunk.split(" ")
     words = []
     for word in theWords:
-        words.append((word, 1)) 
+        if word != '':
+            words.append((word.upper(), 1)) 
 
     return words
 

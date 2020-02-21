@@ -73,18 +73,36 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
     '''
 
     relayers = []
+    reducers = []
+    ranges = int(25/numberOfReducers)
+    prev = 0
+    for i in range(0, numberOfReducers):
+        pass
+        if i == numberOfReducers-1:
+            reducerInfo = rosterDict["Reducer" + str(i)]
+            reducer = list(reducerInfo[0:len(reducerInfo)])
+            reducer.append((chr(65 + prev+1), chr(65+25)))
+        else:        
+            reducerInfo = rosterDict["Reducer" + str(i)]
+            reducer = list(reducerInfo[0:len(reducerInfo)])
+            reducer.append((chr(65 + prev), chr(65 + prev+ranges)))
+
+        prev += ranges
+        reducers.append(reducer)
 
     ###We start by distributing the mappers to the different reducers    
     for i in range(0, numberOfMappers):
         mapperHost, mapperPort = rosterDict["Mapper" + str(i)]
+        '''
         if i >= numberOfReducers : 
             reducerHost, reducerPort = rosterDict["Reducer" + str(i-numberOfReducers)]
         else: 
             reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
+        '''
         ###Start a relayer 
         relayer = subprocess.Popen(['python.exe', 
         'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
-        mapperHost, mapperPort, reducerHost, reducerPort, mapFn], 
+        mapperHost, mapperPort, str(reducers), mapFn], 
         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         ###Send the chunk to them
@@ -99,8 +117,8 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         output = repr(outs)[2:len(repr(outs))-1] 
         output = output.replace('\\r', '')
         output = output.replace('\\n', '')
-        if output == "Ready":
-            print("READY!")
+        if output == "Delivered":
+            print("[MasterMain] DELIVERED to mapper")
         else :   
             print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
 
