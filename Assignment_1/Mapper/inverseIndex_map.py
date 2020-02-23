@@ -4,7 +4,7 @@ import string
 def mapChunk(chunk):
     pass
     
-    theLines = chunk.split("\n")
+    theLines = chunk.split("\\n")
 
     for line in theLines:
         for char in string.punctuation:
@@ -14,9 +14,9 @@ def mapChunk(chunk):
     #i is the line , j is the pos in the line
     for i in range(0, len(theLines)):
         line = theLines[i].split(" ")
-        for j in (0, len(line)):
-            if word != '':
-                words.append((word, i, j))
+        for j in range(0, len(line)):
+            if line[j] != '':
+                words.append((line[j], (i, j)))
 
     return words
 

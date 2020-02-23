@@ -69,7 +69,7 @@ def reduceData(s):
     else:
 
         aReduction = subprocess.Popen(['python.exe', 
-            "C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/wordCount_red.py"], 
+            "C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/inverseIndex_red.py"], 
             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         aReduction.stdin.write(bytes(mapperMessage.data, encoding='utf8'))
         outs, errs = aReduction.communicate(timeout=10)

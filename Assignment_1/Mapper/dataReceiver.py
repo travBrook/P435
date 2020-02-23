@@ -45,7 +45,7 @@ def mapData(s):
     #print(masterMessage)
 
     aMapping = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/wordCount_map.py'], 
+    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/inverseIndex_map.py'], 
     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     aMapping.stdin.write(bytes(masterMessage.data, encoding='utf8'))
     outs, errs = aMapping.communicate(timeout=10)
