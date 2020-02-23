@@ -66,7 +66,7 @@ def takeAttendance(s):
         sys.exit(1)
         #return bytes("OW!", encoding='utf8')
     roster.remove(senderName)
-    return bytes("Thank you, " + senderName, encoding='utf8')
+    return bytes("Thanks", encoding='utf8')
     
 
 '''

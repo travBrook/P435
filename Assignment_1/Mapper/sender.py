@@ -29,10 +29,17 @@ def start_connections(host, port):
 def service_connection(key, mask):
     sock = key.fileobj
     data = key.data
+    global hasDropped
     if mask & selectors.EVENT_READ:
         recv_data = sock.recv(1024)  # Should be ready to read
         if recv_data:
             #print("[Mapper] received", repr(recv_data), "from the server")
+            mess = repr(recv_data)
+            if(mess[2:len(mess)-1] == "Thanks"):
+                hasDropped == True
+                sel.close()
+            else:
+                pass
             data.recv_total += len(recv_data)
         if not recv_data or data.recv_total == data.msg_total:
             #print("[Mapper] closing connection to server")
@@ -67,16 +74,17 @@ thisMessage.theSender.port = host
 thisMessage.theFriend.name = "MDRcvr" + mapID
 thisMessage.theFriend.host = sys.argv[4]
 thisMessage.theFriend.port = sys.argv[5]
-print("Mapper data  : \n", thisMessage.data)
+print("Mapper data  :" + mapID+ "\n", thisMessage.data)
 
 finalMessage = thisMessage.SerializeToString()
 messages = [finalMessage]
 
+hasDropped = False
 
 start_connections(host, int(port))
 
 try:
-    while True:
+    while not hasDropped :
         events = sel.select(timeout=1)
         if events:
             for key, mask in events:

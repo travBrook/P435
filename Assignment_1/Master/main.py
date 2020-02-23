@@ -6,6 +6,7 @@ from signal import SIGTERM
 import time
 from threading import Thread 
 import select
+import collections
 
 clusterID = 0
 startingHost = "127.0.0.1"
@@ -93,12 +94,6 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
     ###We start by distributing the mappers to the different reducers    
     for i in range(0, numberOfMappers):
         mapperHost, mapperPort = rosterDict["Mapper" + str(i)]
-        '''
-        if i >= numberOfReducers : 
-            reducerHost, reducerPort = rosterDict["Reducer" + str(i-numberOfReducers)]
-        else: 
-            reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
-        '''
         ###Start a relayer 
         relayer = subprocess.Popen(['python.exe', 
         'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
@@ -123,13 +118,40 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
 
 
-
-
     '''
-        JUST SEND TO REDUCER SERVER 
-        but when?! perhaps just set a timeout for 45 seconds?
+        Now we try to relay data back from the 
+        reducer dataReceivers to compile the final result
     '''
+    time.sleep(4)
+    ###FIRST spawn relayers
+    relayers2 = []
+    numRelayers = len(relayers)
+    for i in range(0, numberOfReducers):
+        pass
+        reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
+        relayer = subprocess.Popen(['python.exe', 
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
+        reducerHost, reducerPort, str(reducers), mapFn], 
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
+        relayer.stdin.write((bytes("SERVER " + str(numberOfMappers), encoding='utf8')))
+        relayers2.append(relayer)
+        numRelayers =- 1
+
+    ###THEN talk to them to get their outputs
+    finalOutput = {}
+    for relayer in relayers2 : 
+        outs, status = relayer.communicate(timeout=10)
+        output = repr(outs)[2:len(repr(outs))-1] 
+        output = output.replace('\\r', '')
+        output = output.replace('\\n', '')
+        ini_dict = [finalOutput, eval(output)]
+        counter = collections.Counter() 
+        for d in ini_dict:  
+            counter.update(d) 
+        finalOutput = dict(counter)
+    
+    print(str(finalOutput))
 
 '''
     Gets the roster from the text file created

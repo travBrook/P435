@@ -52,11 +52,13 @@ def init_Clusters():
     '''    
     for i in range(0, numberOfMappers): 
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/main.py', startingHost, startingPort, str(i)])
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/main.py', 
+        startingHost, startingPort, str(i)])
 
     for i in range(0, numberOfReducers):
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/main.py', startingHost, startingPort, str(i)])
+        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/main.py', 
+        startingHost, startingPort, str(i), str(numberOfMappers)])
 
 
     '''
