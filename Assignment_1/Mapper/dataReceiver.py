@@ -4,10 +4,10 @@ import types
 import sys
 import subprocess
 import comms_pb2
-
+import os
 
 sel = selectors.DefaultSelector()
-
+path = os.getcwd()
 isMapped = ['blah']
 
 def accept_wrapper(sock):
@@ -38,27 +38,39 @@ def service_connection(key, mask):
                 #print("[MDReceiver] Current absentees on roster : ", roster)
                 data.outb = data.outb[sent:]
 
+'''
+    Takes the data passed from the master
+    and maps the content. Sends the roster
+    of reducers back up to the main branch
+'''
+
 def mapData(s):
 
+    global path
     masterMessage = comms_pb2.AMessage()
     masterMessage.ParseFromString(s)
-    #print(masterMessage)
+
+    functions = masterMessage.functionFileName.split(" ")
+    mapperFn = functions[0]
 
     aMapping = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/inverseIndex_map.py'], 
+    os.path.join(path, "Mapper", mapperFn)], 
     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
     aMapping.stdin.write(bytes(masterMessage.data, encoding='utf8'))
+
     outs, errs = aMapping.communicate(timeout=10)
-    #print("BBBLAHHHH : " + repr(outs))
     theData = repr(outs)[2:len(repr(outs))-1].replace('\\n', '')
     theData = theData.replace('\\r', '')
+
     theReducers = masterMessage.others
     protoHelper = []
     for reducer in theReducers:
-        protoHelper.append([[reducer.host,reducer.port], reducer.range])
+        protoHelper.append([[reducer.host,reducer.port,functions[1]], reducer.range])
 
     toBeSent = theData + "vxyxv" + str(protoHelper)
     print(toBeSent)
+
     isMapped.pop(0)
 
     return bytes("Thank you, i'll handle this, master", encoding='utf8')
@@ -85,7 +97,7 @@ sel.register(lsock, selectors.EVENT_READ, data=None)
 
 
 '''
-    We only terminate when everyone on the roster has been checked off
+    Terminate after mapping data
 '''
 try:
     while len(isMapped) != 0:

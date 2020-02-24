@@ -56,9 +56,13 @@ def service_connection(key, mask):
             data.outb = data.outb[sent:]
 
 
+'''
+    Pretty simple here.
+    Just get the args and store them in the message
+'''
 
-if len(sys.argv) != 6:
-    print("usage:", sys.argv[0], "<host> <port> <id> <rec host/start range> <rec port/ end range>")
+if len(sys.argv) != 7:
+    print("usage:", sys.argv[0], "<host> <port> <id> <rec host/start range> <rec port/ end range> <reducer fn>")
     sys.exit(1)
 
 host = sys.argv[1]
@@ -68,17 +72,18 @@ mapID = sys.argv[3]
 thisMessage = comms_pb2.AMessage()
 thisMessage.data = sys.stdin.readline()
 
+thisMessage.functionFileName = sys.argv[6]
 thisMessage.theSender.name = "Mapper" + mapID
 thisMessage.theSender.host = port
 thisMessage.theSender.port = host
 thisMessage.theFriend.name = "MDRcvr" + mapID
 thisMessage.theFriend.host = sys.argv[4]
 thisMessage.theFriend.port = sys.argv[5]
-print("Mapper data  :" + mapID+ "\n", thisMessage.data)
 
 finalMessage = thisMessage.SerializeToString()
 messages = [finalMessage]
 
+#A work in progress... not necessary
 hasDropped = False
 
 start_connections(host, int(port))

@@ -4,14 +4,13 @@ import selectors
 from psutil import process_iter
 from signal import SIGTERM
 import time
+import os
 #import rpyc
 
 #conn = rpyc.classic.connect("localhost")
 
 
-'''
-    Get new clusterID
-'''
+path = os.getcwd()
 
 clusterID = 0
 startingHost = "127.0.0.1"
@@ -25,7 +24,7 @@ sel = selectors.DefaultSelector()
 notReady = False
 
 def init_Clusters():
-
+    global path
 
     '''
         DO A CHECK THAT EVERYONE IS RESPONDING 
@@ -38,7 +37,7 @@ def init_Clusters():
         are awaiting action.
     '''
     ok = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
+    path + '/Master/okReceiver.py', 
     startingHost, startingPort, str(numberOfMappers), str(numberOfReducers)], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
     
@@ -52,12 +51,12 @@ def init_Clusters():
     '''    
     for i in range(0, numberOfMappers): 
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/main.py', 
+        path + '/Mapper/main.py', 
         startingHost, startingPort, str(i)])
 
     for i in range(0, numberOfReducers):
         subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/main.py', 
+        path+'/Reducer/main.py', 
         startingHost, startingPort, str(i), str(numberOfMappers)])
 
 

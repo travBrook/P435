@@ -5,9 +5,11 @@ import sys
 import subprocess
 import comms_pb2
 import collections
-
+import os
 
 sel = selectors.DefaultSelector()
+
+path = os.getcwd()
 
 isReduced = ['blah']
 numberOfMappers = 0
@@ -45,31 +47,41 @@ def service_connection(key, mask):
 
 def reduceData(s):
 
+
+    '''
+        The message received could have been
+        from either a mapper sender or a 
+        master relayer, so the name of the message
+        is a little misleading...
+
+        The master relayers are trying to take
+        the reduced data while the mappers are 
+        trying to pass of their mapped data to 
+        the reducer
+    '''
     mapperMessage = comms_pb2.AMessage()
     mapperMessage.ParseFromString(s)
-    global endResult 
-    global roster
-    global isReady
+    global endResult, roster, isReady, path
 
-    print("HAAAAAAAH", mapperMessage.data[0:6])
-
-    #Check if the sender is 
+    #Check who the message is from 
     if mapperMessage.data[0:6] == "SERVER":
-        print("NICE")
+
+        ###A reducer will be ready if it has received from all mappers
         if isReady:
             toMasterMessage = comms_pb2.AMessage()
             toMasterMessage.data = str(endResult)
             isReduced.pop(0)
-            print("MADE IT!!\n")
+            print("[Reducer " + redID + "] handing off finished data to master relayer")
             return toMasterMessage.SerializeToString()
         else:
             print("NOT READY!")
             return bytes("NOT READY", encoding='utf8')
 
     else:
+        ###If it's from a mapper we just reduce and add it to the current dictionary
 
         aReduction = subprocess.Popen(['python.exe', 
-            "C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Reducer/inverseIndex_red.py"], 
+            os.path.join(path, "Reducer", mapperMessage.functionFileName)], 
             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         aReduction.stdin.write(bytes(mapperMessage.data, encoding='utf8'))
         outs, errs = aReduction.communicate(timeout=10)
@@ -77,14 +89,10 @@ def reduceData(s):
         theData = repr(outs)[2:len(repr(outs))-1].replace('\\n', '')
         theData = theData.replace('\\r', '')
         theMapper = mapperMessage.theSender.name
-        print(theMapper)
+        print("[Reducer " + redID + "] received data from " + theMapper)
         roster.remove(theMapper)
         if len(roster) == 0:
             isReady = True
-        print("MAP MES DATA :\n", mapperMessage.data)
-        print("MY REDUCER ID IS : ", redID)
-        print("END RESULT:\n",endResult)
-        print("TheData:\n",eval(theData))
         ini_dict = [endResult, eval(theData)]
         counter = collections.Counter() 
         for d in ini_dict:  
@@ -96,10 +104,17 @@ def reduceData(s):
     print("Where ya goin?")
     return bytes("Thank you, i'll handle this, master", encoding='utf8')
 
+
+'''
+    A roster is created so that the reducers can 
+    keep track of all the mappers it has until 
+    it can hand the data off to the server...
+'''
 def createRoster() : 
     global roster
     for i in range(0, numberOfMappers):
         roster.append("Mapper" + str(i))
+
 
 '''
     Getting the parameters and setting up the roster

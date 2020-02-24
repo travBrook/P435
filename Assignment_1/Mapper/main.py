@@ -4,41 +4,50 @@ import selectors
 from psutil import process_iter
 from signal import SIGTERM
 import time
+import os
+path = os.getcwd()
 
 
 def main() :
 
     #print("Howdy from mapper!" + mapID)
     '''
-    FOR STARTING REMOTELY
+    FOR STARTING REMOTELY (unfinished)
     rpc = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/rpyc_classic.py',
+    path+'/Mapper/rpyc_classic.py',
     ("-p "+ str(remoteReceiverPort))])
     '''
+
+    '''
+        Spawn the mappers receiver.
+        Then send back to the master okreceiver
+        if the process is running 
+    ''' 
     
     rcvr = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/dataReceiver.py', 
+    path+'/Mapper/dataReceiver.py', 
     receiverHost, str(receiverPort), mapID], stdout=subprocess.PIPE)
 
     time.sleep(1)
 
     if rcvr.poll() is None : 
         sender = subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/sender.py',
-        startingHost, startingPort, mapID, receiverHost, str(receiverPort)], stdin=subprocess.PIPE)
+        path+'/Mapper/sender.py',
+        startingHost, startingPort, mapID, receiverHost, str(receiverPort), "placeholder"], stdin=subprocess.PIPE)
         time.sleep(2)
         sender.communicate((bytes("", encoding='utf8')))    
     else :
         print("Mapper" + str(mapID) + "had trouble starting")
         sys.exit(1)
 
+    print("[Mapper " + mapID + "] awaiting data...")
+
+    ###Get the data from the mapper receiver to send to reducers
     outs, errs = rcvr.communicate(timeout=40)
     #rcvr.wait()
     
-    #print(repr(outs))
     everything = repr(outs)[2:len(repr(outs))-1].replace('\\n', '')
     theGoods = everything.replace('\\r', '').split('vxyxv')
-    #mappedData = eval(theGoods[0][1:len(theGoods[0])-1])
     theData = eval(theGoods[0])
     reducers = eval(theGoods[1])
     
@@ -57,11 +66,14 @@ def main() :
                 theReducersJob.append(theData[i])
         reducerHost = reducer[0][0]
         reducerPort = reducer[0][1]
+        reducerFn = reducer[0][2]
         sender = subprocess.Popen(['python.exe', 
-            'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Mapper/sender.py',
-            reducerHost, reducerPort, mapID, reducerStartRange, reducerEndRange], stdin=subprocess.PIPE)
+            path+'/Mapper/sender.py',
+            reducerHost, reducerPort, mapID, reducerStartRange, reducerEndRange, reducerFn], stdin=subprocess.PIPE)
 
         sender.communicate(bytes(str(theReducersJob), encoding='utf8'))
+
+    print("[Mapper " + mapID + "] has sent data to reducers")
     
 
 if len(sys.argv) != 4:

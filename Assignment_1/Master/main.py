@@ -7,6 +7,9 @@ import time
 from threading import Thread 
 import select
 import collections
+import os
+
+path = os.getcwd()
 
 clusterID = 0
 startingHost = "127.0.0.1"
@@ -19,7 +22,7 @@ numberOfReducers = 0
 ###FOR ME : For path issues, consider local variable (could even be read off of file), then concat
 
 def runMapRed(inputData, mapFn, redFn, outputLoc) : 
-
+    global path
     '''
         Retrieve the data and split it up evenly for the 
         amount of mappers. 
@@ -54,25 +57,13 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
                 thisChunk = thisChunk + line
         chunks.append(thisChunk)
 
-
-    '''
-        Spawn the master receiver to receive okays from 
-        completed mappers. Master will respond with host/ports 
-        of reducers and the function
-    '''
-
-    '''
-    ok = subprocess.Popen(['python.exe', 
-    'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/okReceiver.py', 
-    startingHost, startingPort, str(numberOfMappers), str(numberOfReducers)], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    '''
-
     '''
         Spawn master dataRelayers for each mapper.  
         give these traders the data, mapper host/port, 
         and the corrsponding reducer host/port
     '''
 
+    ###This first part outfits the reducers with their information to give to the mappers
     relayers = []
     reducers = []
     ranges = int(25/numberOfReducers)
@@ -91,13 +82,14 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         prev += ranges
         reducers.append(reducer)
 
+    print("[Master] sending data to mappers...")
     ###We start by distributing the mappers to the different reducers    
     for i in range(0, numberOfMappers):
         mapperHost, mapperPort = rosterDict["Mapper" + str(i)]
         ###Start a relayer 
         relayer = subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
-        mapperHost, mapperPort, str(reducers), mapFn], 
+        path+'/Master/dataRelayer.py',
+        mapperHost, mapperPort, str(reducers), mapFn + " " + redFn],  
         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         ###Send the chunk to them
@@ -112,10 +104,11 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         output = repr(outs)[2:len(repr(outs))-1] 
         output = output.replace('\\r', '')
         output = output.replace('\\n', '')
-        if output == "Delivered":
-            print("[MasterMain] DELIVERED to mapper")
-        else :   
-            print("[Master_Main] Relayer(s) to a mapper failed us! Exitting...")
+        if output != "Delivered":
+            print("[Master] Relayer(s) to a mapper failed us! Exitting...")
+        
+            
+    print("[Master] Relayers have delivered. Contacting Reducers in 4 seconds")
 
 
     '''
@@ -130,7 +123,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         pass
         reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
         relayer = subprocess.Popen(['python.exe', 
-        'C:/Users/T Baby/Documents/GitHub/P435/Assignment_1/Master/dataRelayer.py',
+        path+'/Master/dataRelayer.py',
         reducerHost, reducerPort, str(reducers), mapFn], 
         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
@@ -151,7 +144,20 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             counter.update(d) 
         finalOutput = dict(counter)
     
-    print(str(finalOutput))
+    #print(str(finalOutput))
+
+    outputData(str(finalOutput))
+
+
+'''
+    Writes the finalOutput to a file
+'''
+
+def outputData(finalOutput):
+
+    f = open(os.path.join(path, outputFile), "+a")    
+    f.write(finalOutput)
+    f.close()
 
 '''
     Gets the roster from the text file created
@@ -178,7 +184,7 @@ def countEm():
     numberOfReducers = 0
     for key in rosterDict.keys():
         #taken from stack exchange https://stackoverflow.com/questions/12851791/removing-numbers-from-string
-        mapOrRed = ''.join([i for i in key if not i.isdigit()]) 
+        mapOrRed = ''.join([i for i in key if not i.isdigit()]) #<----
         if mapOrRed == "Mapper" :
             numberOfMappers += 1
         if mapOrRed == "Reducer" :
@@ -193,10 +199,10 @@ if len(sys.argv) != 6:
     print("usage:", sys.argv[0], "<inputFileLoc> <map fn> <red fn> <outputFileLoc> <cluster id>")
     sys.exit(1)
 
-inputFile = sys.argv[1]
+inputFile = os.path.join(path, "MapRedDataSets", sys.argv[1]) 
 mapFn = sys.argv[2]
 redFn = sys.argv[3]
-outputFile = sys.argv[4]
+outputFile = os.path.join(path, sys.argv[4])
 clusterID = int(sys.argv[5])
 
 
