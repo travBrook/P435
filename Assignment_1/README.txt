@@ -17,7 +17,7 @@ but the opportunity has been left open.
 As of now, the only text file it works with is the aSimpleText.txt file.
 The other txt files have characters that mess with the google protocol buffers. 
 
-If you get an error like this, you just need to wait about 30 seconds before you try again.
+If you get an error like below, you just need to wait about 30 seconds before you try again.
 
 Traceback (most recent call last):
   File "C:\Users\travb\Desktop\P435\Assignment_1\Master\init.py", line 163, in <module>

@@ -51,6 +51,8 @@ def main() :
     theData = eval(theGoods[0])
     reducers = eval(theGoods[1])
     
+    print("[Mapper "+ mapID + "] has finished its task... sending to reducers")
+
     '''
         Once we have the mappedData, we create senders to send
         this data to the reducer servers

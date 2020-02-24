@@ -144,7 +144,8 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             counter.update(d) 
         finalOutput = dict(counter)
     
-    #print(str(finalOutput))
+    print("[Master] WRITING THIS TO FILE : ")
+    print(str(finalOutput))
 
     outputData(str(finalOutput))
 
