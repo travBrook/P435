@@ -3,8 +3,12 @@ import string
 
 def mapChunk(chunk):
     pass
-    for char in string.punctuation:
-        chunk = chunk.replace(char, '')
+
+    for char in (string.punctuation+'\n'):
+        if char == '\n':
+            chunk = chunk.replace(char, ' ')
+        else:
+            chunk = chunk.replace(char, '')
 
     theWords = chunk.split(" ")
     words = []

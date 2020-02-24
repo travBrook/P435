@@ -47,14 +47,15 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
         pass
         thisChunk = ""
         for j in range(0, mappersShare):
-            line = lines.pop(0).replace("\n", " ")
-            thisChunk = thisChunk + line
+            line = lines.pop(0).replace("\n", " \\n")
+            thisChunk = thisChunk +" "+ line
 
         #The last mapper might take a few extra lines....
         if i == numberOfMappers-1:
             for line in lines :
-                line = lines.pop(0).replace("\n", " ")
-                thisChunk = thisChunk + line
+                line = lines.pop(0).replace("\n", " \\n")
+                thisChunk = thisChunk+" "+line
+
         chunks.append(thisChunk)
 
     '''
@@ -118,7 +119,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
     time.sleep(4)
     ###FIRST spawn relayers
     relayers2 = []
-    numRelayers = len(relayers)
+    #numRelayers = len(relayers)
     for i in range(0, numberOfReducers):
         pass
         reducerHost, reducerPort = rosterDict["Reducer" + str(i)]
@@ -129,7 +130,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
 
         relayer.stdin.write((bytes("SERVER " + str(numberOfMappers), encoding='utf8')))
         relayers2.append(relayer)
-        numRelayers =- 1
+        #numRelayers =- 1
 
     ###THEN talk to them to get their outputs
     finalOutput = {}
@@ -144,6 +145,7 @@ def runMapRed(inputData, mapFn, redFn, outputLoc) :
             counter.update(d) 
         finalOutput = dict(counter)
     
+    del finalOutput['N']
     print("[Master] WRITING THIS TO FILE : ")
     print(str(finalOutput))
 

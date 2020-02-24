@@ -6,3 +6,9 @@ python "YOURPATHTOASSIGNMENT1\Master\init.py" 2 2
 python "YOURPATHTOASSIGNMENT1\Master\main.py" aSimpleText.txt wordCount_map.py wordCount_red.py Master/output.txt 1
 
 (The second argument for the above call needs to be in the MapRedDataSets directory)
+
+
+
+My cmd
+python "C:\Users\travb\Desktop\P435\Assignment_1\Master\init.py" 2 2
+python "C:\Users\travb\Desktop\P435\Assignment_1\Master\main.py" aSimpleText.txt wordCount_map.py wordCount_red.py Master/output.txt 1

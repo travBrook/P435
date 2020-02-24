@@ -26,5 +26,7 @@ NameError: name 'psutil' is not defined
 
 The lines that make this error occur usualluy just unbind the ports
 that we use. Without first unbinding, the program will fail hard. 
-Yes its annoying, but at least you dont have to manually kill off the processes
+Yes its annoying, but you dont have to manually kill off the processes
 
+Inverse index does not work yet. And long text files will give the 
+program problems as well

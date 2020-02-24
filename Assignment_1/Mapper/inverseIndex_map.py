@@ -7,9 +7,11 @@ def mapChunk(chunk):
     theLines = chunk.split("\\n")
 
     for line in theLines:
-        for char in string.punctuation:
-            line = line.replace(char, '')
-
+        for char in string.punctuation+'\n':
+            if char == '\n':
+                chunk = chunk.replace(char, ' ')
+            else:
+                chunk = chunk.replace(char, '')
     words = []
     #i is the line , j is the pos in the line
     for i in range(0, len(theLines)):
