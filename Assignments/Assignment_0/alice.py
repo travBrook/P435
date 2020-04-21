@@ -4,8 +4,8 @@ import selectors
 import types
 import time  
 
-host = "127.0.0.1"
-port = 65431
+host = "127.0.0.3"
+port = 65433
 
 sel = selectors.DefaultSelector()
 messages = [b"STORE foo=username", b"STORE blah=username2"]

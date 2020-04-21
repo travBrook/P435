@@ -1,0 +1,89 @@
+SUMMARY OF PAPER
+----------------------
+
+INTRO
+
+The boys at Google ran into a problem... They had easy tasks - like
+finding the top queries in a given day - but they were overwhelmed 
+with the amount of data. It was necessary to run computations across
+multiple machines... How to do this? MAP-REDUCE.
+
+THE MODEL
+
+Input/output key-value pairs
+MAP - a user defined function that processes the initial key-values
+GROUP - Takes the key-values that MAP produced, and groups them by key
+REDUCE - a user defined function that does some kind of merging on the groups
+	 of keys
+
+IMPLEMENTATION
+
+The Google implementation : Use a large amount of inexpensive hardware.
+Users enter jobs -- a scheduler takes a look at what is availble, and 
+distributes the work out to the machines.
+
+	MAPREDUCE in detail
+	
+	The library splits the input files into small chunks of data (16- 64 mb)
+	(Amount of chunks = m)
+	
+	The master picks workers to perform the map and reduce tasks.
+
+	After applying map task to key/values, they write to a local disk
+	where the reducers pick up up data and group it before their reduce 
+	tasks.
+	
+	After the reducers do their thang, they create an output file on a
+	local disk that is picked up for the user.
+
+
+FAULTS
+
+If a worker fails (map or reducer) the whole process for the given chunks start
+over. If a master fails, a new copy starts from the last checkpointed state. 
+Replication of map work is ignored, while replication of reducer work is overwritten. 
+
+To conserve bandwidth, GFS keeps the location of a chunk in mind. For a given chunk on 
+a machine in a given cluster, GFS will try to get a free worker in the given cluster so
+that no bandwidth is consumed.
+
+REFINEMENTS 
+
+Methods such as adding additional functions for the user to "combine" data during the 
+map task instead of sending huge lists for the reducer to handle.
+
+PERFORMANCE 
+
+Back up tasks are good, machine failures are not a big problem.
+
+CONCLUSION
+
+Map-reduce is helpful for many things, and is easy for users to implement.
+
+
+
+THE VIDEO 
+
+The video was less focused on map-reduce (although there was still a lot of content on it), 
+and more about the evolution of how google came upon using map-reduce, given their hardware demands,
+and demands of their users. There were similarities between paper and video -- for example, both 
+gave an in depth explanation on how map-reduce works, and the problems they ran into like 
+stragglers (slower workers), and bugs that the user code faced (slow returns on certain searches).
+Also, they discussed the advantages of backup workers, and how the set up of their clusters were 
+beneficial to manage bandwidth. 
+
+One of the major topics that the video covered that the paper did not, was a list of tips to consider
+when implementing something like this in your own way. Tips like, break large complex services into 
+smaller pieces. 
+
+Instead of just focusing on Google's implementation, the paper goes on to explain other related methods 
+for handling situations like the one that Google faced (like Bulk Synchronous Programming and River).
+The paper had more evidence for the usefulness of having back up machines, and the resilience of map-reduce
+through graphs of the whole process.
+
+
+
+
+	
+	
+
