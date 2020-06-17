@@ -5,7 +5,7 @@ PLEASE RUN THE COMMANDS FROM THE ASSIGNMENT ONE DIRECTORY
 Right now, the only local communication that happens is when the
 init.py file in the master directory spawns the mapper and reducer 
 main processes... I have not implemented it yet, -- although there
-is remnants of the code lying around -- but for the future, the
+are remnants of the code lying around -- but for the future, the
 idea would be that you spawn servers for the mappers/reducers,
 and make a remote procedure call on the servers to run the main.py
 files. This was left to the end because it is easier to test without
@@ -24,9 +24,6 @@ Traceback (most recent call last):
     except psutil.AccessDenied:  # JUST WAIT
 NameError: name 'psutil' is not defined
 
-The lines that make this error occur usualluy just unbind the ports
+The lines that make this error occur usually just unbind the ports
 that we use. Without first unbinding, the program will fail hard. 
 Yes its annoying, but you dont have to manually kill off the processes
-
-Inverse index does not work yet. And long text files will give the 
-program problems as well
